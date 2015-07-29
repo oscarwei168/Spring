@@ -1,0 +1,41 @@
+@CHARSET "UTF-8";
+
+* {
+    /* margin: 0; */
+    /* padding: 0; */
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizelegibility;
+    padding-top: 50px;
+}
+
+footer {
+    background: #333;
+    color: #eee;
+    font-size: 11px;
+    padding: 20px;
+}
+
+a {
+    /* color: black; */
+    text-decoration: none;
+}
+
+.ui-growl {
+    margin-top: 50px;
+}
+
+#mainContent {
+    margin: 20px 0px;
+}
+
+@media ( max-width: 480px) {
+}
+
+@media ( max-width: 768px) {
+}
+
+@media ( min-width: 1200px) {
+}

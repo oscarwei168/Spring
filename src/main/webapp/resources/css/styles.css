@@ -1,0 +1,307 @@
+/* --------------------------------------
+   Layout
+   -------------------------------------- */
+#masthead {
+    min-height: 250px;
+}
+
+#masthead h1 {
+    font-size: 30px;
+    line-height: 1;
+    padding-top: 20px;
+}
+
+#masthead .well {
+    margin-top: 8%;
+}
+
+@media screen and (min-width: 768px) {
+    #masthead h1 {
+        font-size: 50px;
+    }
+}
+
+#features {
+    text-align: center;
+}
+
+#features img {
+    margin: 0 0 20px;
+}
+
+#inputMessage {
+    margin-bottom: 15px;
+}
+
+footer {
+    background: #333;
+    color: #eee;
+    font-size: 11px;
+    padding: 20px;
+}
+
+/* --------------------------------------
+   Typography
+   -------------------------------------- */
+
+body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizelegibility;
+}
+
+.well .page-header {
+    margin-top: 0;
+}
+
+.well .page-header h1 {
+    margin-top: 0;
+}
+
+ul.unstyled {
+    list-style: none;
+    padding: 0;
+}
+
+/* --------------------------------------
+   Navbar
+   -------------------------------------- */
+
+#searchInput {
+    width: 200px;
+}
+
+.navbar-brand {
+    padding: 13px 15px;
+}
+
+.navbar-inverse .navbar-toggle {
+    color: white;
+    font-weight: bold;
+    border-color: white;
+}
+
+.navbar-inverse .navbar-toggle:hover {
+    background-color: #ddd;
+    color: #333;
+}
+
+.navbar-inverse .navbar-toggle:hover .glyphicon {
+    color: #333;
+}
+
+.tab-pane {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 0.8em;
+}
+
+.active .glyphicon {
+    color: red;
+}
+
+/* --------------------------------------
+   Carousel
+   -------------------------------------- */
+
+.carousel {
+    border: 10px solid #fff;
+    /*
+    -webkit-transform: rotate(1deg);
+    -moz-transform: rotate(1deg);
+    -ms-transform: rotate(1deg);
+    -o-transform: rotate(1deg);
+    transform: rotate(1deg);
+    */
+    -webkit-box-shadow: 10px 10px 20px #002424;
+    -moz-box-shadow: 10px 10px 20px #002424;
+    box-shadow: 10px 10px 20px #002424;
+}
+
+#myCarousel {
+    margin-top: 60px;
+}
+
+.carousel-caption {
+    font-size: 24px;
+}
+
+.carousel-caption h4 {
+    font-size: 32px;
+}
+
+#myCarousel .item {
+    height: 400px;
+}
+
+#slide1 {
+    /*background: url('#{resource['default/1_0/img:carousel_medium_01.jpg']}') top center no-repeat;*/
+    background: url("../images/carousel_medium_01.jpg") top center no-repeat;
+}
+
+#slide2 {
+    /*background: url('#{resource['default/1_0/img:carousel_medium_02.jpg']}') top center no-repeat;*/
+    background: url("../images/carousel_medium_02.jpg") top center no-repeat;
+}
+
+#slide3 {
+    /*background: url('#{resource['default/1_0/img:carousel_medium_03.jpg']}') top center no-repeat;*/
+    background: url("../images/carousel_medium_03.jpg") top center no-repeat;
+}
+
+/* --------------------------------------
+   Global Styles
+   -------------------------------------- */
+
+.alert {
+    margin-top: 20px;
+    display: none;
+}
+
+.well {
+    margin: 20px 0;
+}
+
+.tabbable img.thumbnail {
+    margin: 0 20px 10px 0;
+}
+
+.thumbnails {
+    margin: 20px 0;
+}
+
+.thumbnail {
+    position: relative;
+}
+
+.thumbnail h3 {
+    font-size: 16px;
+    margin: 0 0 10px;
+    line-height: 20px;
+}
+
+.thumbnail .price {
+    font-size: 22px;
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    padding: 10px;
+}
+
+.thumbnail .price sup {
+    font-weight: normal;
+    font-size: 12px;
+}
+
+.thumbnail span.glyphicon {
+    margin-right: 5px;
+}
+
+.pull-right.img-responsive {
+    /* margin: 0 0 1em 1em; */
+}
+
+.featurette-divider {
+    margin: 80px 0; /* Space out the Bootstrap <hr> more */
+}
+
+.featurette-heading {
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -1px;
+}
+
+/* Custom button style */
+/*
+.btn-info {
+	background-color: #cdae51;
+	border-color: #3f2b22;
+	color: #fff;
+}
+
+.btn-info:hover,
+.btn-info:focus,
+.btn-info:active,
+.btn-info:active,
+.open .dropdown-toggle.btn-info {
+	color: #ffffff;
+	background-color: #3f2b22;
+	border-color: #333;
+}
+*/
+
+/* --------------------------------------
+   Media Queries
+   -------------------------------------- */
+
+/* Portrait & landscape phone */
+@media (max-width: 480px) {
+
+    .thumbnail .price {
+        font-size: 14px;
+    }
+
+    .thumbnail .price sup {
+        font-size: 10px;
+    }
+
+}
+
+/* Landscape phone to portrait tablet */
+@media (max-width: 768px) {
+
+    #myCarousel .item {
+        height: 310px;
+    }
+
+    #slide1 {
+        /*background: url('#{resource['default/1_0/img:carousel_small_01.jpg']}') top center no-repeat;*/
+    }
+
+    #slide2 {
+        /*background: url('#{resource['default/1_0/img:carousel_small_02.jpg']}') top center no-repeat;*/
+    }
+
+    #slide3 {
+        /*background: url('#{resource['default/1_0/img:carousel_small_03.jpg']}') top center no-repeat;*/
+    }
+
+    .carousel-caption {
+        font-size: 16px;
+    }
+
+    .carousel-caption h4 {
+        font-size: 22px;
+    }
+
+    .featurette-heading {
+        font-size: 50px;
+    }
+
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+
+    #myCarousel .item {
+        height: 500px;
+    }
+
+    #slide1 {
+        /*background: url('#{resource['default/1_0/img:carousel_large_01.jpg']}') top center no-repeat;*/
+    }
+
+    #slide2 {
+        /*background: url('#{resource['default/1_0/img:carousel_large_02.jpg']}') top center no-repeat;*/
+    }
+
+    #slide3 {
+        /*background: url('#{resource['default/1_0/img:carousel_large_03.jpg']}') top center no-repeat;*/
+    }
+
+    .featurette-heading {
+        margin-top: 120px;
+        font-size: 50px;
+    }
+
+}

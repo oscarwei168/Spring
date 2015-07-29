@@ -1,0 +1,52 @@
+/**
+ * For Time Sheet additional css configuration.
+ */
+
+.fc-sun {
+    background-color: #ECCECE;
+    color: red;
+}
+
+.fc-sat {
+    background-color: #CBECCB;
+    color: green;
+}
+
+.fc-event-HOLIDAY {
+    background-color: DarkKhaki;
+    color: white;
+}
+
+.fc-event-LEAVE {
+    background-color: DarkKhaki;
+    color: white;
+}
+
+.fc-event-WORK {
+    background-color: DarkSeaGreen;
+    color: white;
+}
+
+.dts-message-Info {
+    height: 48px;
+    width: 48px;
+    float: left;
+    text-align: center;
+    background-image:url(../../images/info.png);
+}
+
+.dts-message-Warn {
+    height: 48px;
+    width: 48px;
+    float: left;
+    text-align: center;
+    background-image:url(../../images/warn.png);
+}
+
+.dts-message-Error {
+    height: 64px;
+    width: 64px;
+    float: left;
+    text-align: center;
+    background-image:url(../../images/error.png);
+}
