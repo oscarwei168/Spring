@@ -85,8 +85,8 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
     @Override
     protected Class<?>[] getRootConfigClasses() {
         // SecurityConfig.class, JpaConfig.class
-        return new Class<?>[] {AppConfig.class, HibernateConfig.class, CacheConfig.class, MailConfig
-                .class, FreemarkerConfig.class};
+        return new Class<?>[] {AppConfig.class, HibernateConfig.class, SecurityConfig.class, CacheConfig.class,
+                MailConfig.class, FreemarkerConfig.class};
     }
 
     /**

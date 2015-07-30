@@ -15,11 +15,13 @@ package tw.com.oscar.spring.function.testcase.dao.impl;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import tw.com.oscar.spring.domain.Account;
 import tw.com.oscar.spring.function.testcase.dao.AccountDao;
 import tw.com.oscar.spring.util.common.dao.daobak1.BaseDAO;
 
+import javax.inject.Inject;
 import java.util.stream.Stream;
 
 /**
@@ -42,13 +44,15 @@ import java.util.stream.Stream;
 @Repository
 public class AccountDaoImpl extends BaseDAO<Account, Long> implements AccountDao {
 
+    @Inject
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public Stream findByName(String name) {
         Criteria criteria = getSession().createCriteria(Account.class);
         criteria.add(Restrictions.like("name", name, MatchMode.ANYWHERE));
         return criteria.list().stream();
     }
-
 
 //    @Override
 //    @Cacheable("test-cache")

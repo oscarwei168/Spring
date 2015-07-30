@@ -1,7 +1,7 @@
 /**
  * Account.java
- * Title: DTS Project
- * Copyright: Copyright(c)2015, Acer
+ * Title: Oscar Wei Web Project
+ * Copyright: Copyright(c)2015, oscarwei168
  *
  * @author Oscar Wei
  * @since 2015/7/30
@@ -38,13 +38,13 @@ import java.sql.Clob;
  * <p>
  * Title: Account.java<br>
  * </p>
- * <strong>Description:</strong> //TODO <br>
+ * <strong>Description:</strong> A Account domain object <br>
  * This function include: - <br>
  * <p>
  * Copyright: Copyright (c) 2015<br>
  * </p>
  * <p>
- * Company: Acer Inc.
+ * Company: oscarwei168 Inc.
  * </p>
  *
  * @author Oscar Wei

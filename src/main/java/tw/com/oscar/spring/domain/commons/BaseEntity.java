@@ -61,6 +61,11 @@ public class BaseEntity extends ID implements Serializable {
         return userCreated;
     }
 
+    /**
+     * A setter for 'userCreated' property
+     *
+     * @param userCreated a userCreated value
+     */
     public void setUserCreated(String userCreated) {
         this.userCreated = userCreated;
     }
@@ -77,6 +82,11 @@ public class BaseEntity extends ID implements Serializable {
         return dateCreated;
     }
 
+    /**
+     * A setter for 'dateCreated' property
+     *
+     * @param dateCreated a dateCreated value
+     */
     public void setDateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
     }
@@ -92,6 +102,11 @@ public class BaseEntity extends ID implements Serializable {
         return userLastModified;
     }
 
+    /**
+     * A setter for 'userLastModified' property
+     *
+     * @param userLastModified a userLastModified value
+     */
     public void setUserLastModified(String userLastModified) {
         this.userLastModified = userLastModified;
     }
@@ -107,10 +122,20 @@ public class BaseEntity extends ID implements Serializable {
         return dateLastModified;
     }
 
+    /**
+     * A setter for 'dateLastModified' property
+     *
+     * @param dateLastModified a dataLastModified value
+     */
     public void setDateLastModified(Date dateLastModified) {
         this.dateLastModified = dateLastModified;
     }
 
+    /**
+     * A method for checking whether is new or not?
+     *
+     * @return true if new, or false otherwise
+     */
     @Transient
     public boolean isNew() {
         return (null == this.id);
