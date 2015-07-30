@@ -14,21 +14,21 @@ import java.util.Date;
 @Access(AccessType.PROPERTY)
 public class BaseEntity implements Serializable {
 
-    protected Long pid;
+    protected Long id;
     private String userCreated;
     private Date dateCreated;
     private String userLastModified;
     private Date dateLastModified;
 
     @Id
-    @Column(name = "PID", nullable = false)
+    @Column(name = "ID", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long getPid() {
-        return pid;
+    public Long getId() {
+        return id;
     }
 
-    private void setPid(Long pid) {
-        this.pid = pid;
+    private void setId(Long id) {
+        this.id = id;
     }
 
     @Column(name = "USER_CREATED", nullable = false, updatable = false)
@@ -75,6 +75,6 @@ public class BaseEntity implements Serializable {
 
     @Transient
     public boolean isNew() {
-        return (null == this.pid);
+        return (null == this.id);
     }
 }

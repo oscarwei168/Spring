@@ -16,6 +16,7 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -48,6 +49,7 @@ import tw.com.oscar.spring.util.aspect.LoggingBeanPostProcessor;
 @Configuration
 @EnableAsync
 @EnableScheduling
+@EnableAspectJAutoProxy
 @Order(1)
 @ComponentScan(basePackageClasses = Application.class,
         excludeFilters = @ComponentScan.Filter({Controller.class, Configuration.class}))

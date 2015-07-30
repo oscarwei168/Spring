@@ -12,13 +12,13 @@
  */
 package tw.com.oscar.spring.function.testcase.dao.impl;
 
-import com.googlecode.genericdao.dao.hibernate.GenericDAOImpl;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import tw.com.oscar.spring.domain.Account;
 import tw.com.oscar.spring.function.testcase.dao.AccountDao;
+import tw.com.oscar.spring.util.common.dao.daobak1.BaseDAO;
 
 import java.util.stream.Stream;
 
@@ -40,10 +40,10 @@ import java.util.stream.Stream;
  * @since 2015/7/27
  */
 @Repository
-public class AccountDaoImpl extends GenericDAOImpl<Account, Long> implements AccountDao {
+public class AccountDaoImpl extends BaseDAO<Account, Long> implements AccountDao {
 
     @Override
-    public Stream<Account> findByName(String name) {
+    public Stream findByName(String name) {
         Criteria criteria = getSession().createCriteria(Account.class);
         criteria.add(Restrictions.like("name", name, MatchMode.ANYWHERE));
         return criteria.list().stream();

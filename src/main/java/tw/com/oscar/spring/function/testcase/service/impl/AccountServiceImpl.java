@@ -1,7 +1,7 @@
 /**
  * AccountServiceImpl.java
- * Title: DTS Project
- * Copyright: Copyright(c)2015, Acer
+ * Title: Oscar Wei Web Project
+ * Copyright: Copyright(c)2015, oscarwei168
  *
  * @author Oscar Wei
  * @since 2015/7/27
@@ -32,7 +32,7 @@ import java.util.stream.Stream;
  * Copyright: Copyright (c) 2015<br>
  * </p>
  * <p>
- * Company: Acer Inc.
+ * Company: oscarwei168 Inc.
  * </p>
  *
  * @author Oscar Wei
@@ -51,7 +51,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Stream<Account> findAll() {
-        return null;
+        return accountDao.findAll().stream();
     }
 
     /**
@@ -59,7 +59,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Optional<Account> findByPid(Long pid) {
-        return null;
+        return Optional.ofNullable(accountDao.find(pid));
     }
 
     /**

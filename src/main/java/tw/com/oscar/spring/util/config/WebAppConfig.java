@@ -1,5 +1,5 @@
 /**
- * WepAppConfig.java
+ * WebAppConfig.java
  * Title: Oscar Wei Project
  * Copyright: Copyright(c)2015, oscarwei168
  *
@@ -14,6 +14,8 @@ package tw.com.oscar.spring.util.config;
 
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.apache.commons.lang.CharEncoding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -48,17 +50,19 @@ import org.thymeleaf.extras.tiles2.spring4.web.view.ThymeleafTilesView;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
+import org.thymeleaf.templateresolver.TemplateResolver;
 import tw.com.oscar.spring.Application;
 import tw.com.oscar.spring.util.formatter.AccountFormatter;
 import tw.com.oscar.spring.util.security.CSRFHandlerInterceptor;
 import tw.com.oscar.spring.util.security.CSRFRequestDataValueProcessor;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Properties;
 
 /**
  * <p>
- * Title: WepAppConfig.java
+ * Title: WebAppConfig.java
  * </p>
  * <strong>Description:</strong> A spring component that initial spring mvc features <br>
  * This function include: - <br>
@@ -80,11 +84,15 @@ import java.util.Properties;
 @Configuration
 @ComponentScan(basePackageClasses = {Application.class}, includeFilters = @ComponentScan.Filter
         (Controller.class), useDefaultFilters = false)
-class WepAppConfig extends WebMvcConfigurationSupport {
+class WebAppConfig extends WebMvcConfigurationSupport {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebAppConfig.class);
 
     private static final int CACHE_PERIOD = 31556926; // one year
 
     private static final String MESSAGE_SOURCE = "/WEB-INF/i18n/messages";
+
+    private static final String VIEW = "/WEB-INF/views/";
 
     private static final String RESOURCES_LOCATION = "/resources/";
     private static final String RESOURCES_HANDLER = RESOURCES_LOCATION + "**";
@@ -124,9 +132,9 @@ class WepAppConfig extends WebMvcConfigurationSupport {
      * @return The TemplateResolver implementation
      */
     @Bean
-    public ServletContextTemplateResolver templateResolver() {
-        ServletContextTemplateResolver resolver = new ServletContextTemplateResolver();
-        resolver.setPrefix("/WEB-INF/views/");
+    public TemplateResolver templateResolver() {
+        TemplateResolver resolver = new ServletContextTemplateResolver();
+        resolver.setPrefix(VIEW);
         resolver.setSuffix(".html");
         resolver.setTemplateMode("HTML5"); // XHTML is default
         resolver.setOrder(1);
@@ -305,6 +313,11 @@ class WepAppConfig extends WebMvcConfigurationSupport {
     @Controller
     static class FaviconController {
 
+        /**
+         * Handles favicon.ico requests assuring no <code>404 Not Found</code> error is returned
+         *
+         * @return a favorite icon uri mapping
+         */
         @RequestMapping("favicon.ico")
         String favicon() {
             return "forward:/resources/images/favicon.ico";
@@ -317,8 +330,15 @@ class WepAppConfig extends WebMvcConfigurationSupport {
     @Controller
     static class IndexController {
 
+        /**
+         * A method for mapping '/' or '/index' url
+         *
+         * @param principal a Principle object
+         * @return a template uri
+         */
         @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
-        String index() {
+        String index(Principal principal) {
+            LOGGER.info("Principle exist : " + (null != principal));
             return "index";
         }
     }

@@ -12,10 +12,11 @@
  * 2015/3/8 Oscar Wei v1
  * + File created 
  */
-package tw.com.oscar.spring.domain;
+package tw.com.oscar.spring.domain.commons;
 
 import org.hibernate.annotations.OptimisticLockType;
 import org.hibernate.annotations.OptimisticLocking;
+import tw.com.oscar.spring.domain.commons.BaseEntity;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;

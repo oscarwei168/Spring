@@ -74,6 +74,6 @@ public class AccountFormatter implements Formatter<Account> {
      */
     @Override
     public String print(Account object, Locale locale) {
-        return (null != object ? object.getPid().toString() : "");
+        return (null != object ? object.getId().toString() : "");
     }
 }

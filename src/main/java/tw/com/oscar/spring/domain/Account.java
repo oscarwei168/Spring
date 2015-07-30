@@ -1,18 +1,18 @@
 /**
- * Title: Acer Internal Project
- * Copyright: (c) 2015, Acer Inc.
- * Name: Account
+ * Account.java
+ * Title: DTS Project
+ * Copyright: Copyright(c)2015, Acer
  *
  * @author Oscar Wei
- * @since 2015/3/7
+ * @since 2015/7/30
  * <p>
  * H i s t o r y
- * <p>
- * 2015/3/7 Oscar Wei v1
+ * 2015/7/30 Oscar Wei v1
  * + File created
  */
 package tw.com.oscar.spring.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
@@ -20,12 +20,11 @@ import org.hibernate.annotations.*;
 import org.hibernate.search.annotations.*;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.validator.constraints.Email;
+import tw.com.oscar.spring.domain.commons.VersionEntity;
 import tw.com.oscar.spring.domain.enums.Gender;
 
 import javax.persistence.*;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
 import javax.persistence.Index;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -34,18 +33,23 @@ import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 /**
- * <strong>Description:</strong><br>
- * This function include: - A Account entity <br>
+ * <p>
+ * Title: Account.java<br>
+ * </p>
+ * <strong>Description:</strong> //TODO <br>
+ * This function include: - <br>
+ * <p>
+ * Copyright: Copyright (c) 2015<br>
+ * </p>
+ * <p>
+ * Company: Acer Inc.
+ * </p>
  *
  * @author Oscar Wei
- * @version v1, 2015/3/7
- * @since 2015/3/7
+ * @version v1, 2015/7/30
+ * @since 2015/7/30
  */
 @Entity
 @Table(name = "ACCOUNT", uniqueConstraints = @UniqueConstraint(name = "UK_USERNAME", columnNames
@@ -70,6 +74,7 @@ public class Account extends VersionEntity {
     public static final String SQL_ACCOUNT_FIND_BY_EMAIL = "accountFindByEmail";
 
     private String username;
+    @JsonIgnore
     private String password;
     private String firstName;
     private String lastName;
@@ -79,15 +84,6 @@ public class Account extends VersionEntity {
     private BigDecimal yearEndBonus;
     private Blob photo;
     private Clob description;
-
-    private Department department; // 1:1
-    private Set<String> telephones; // 1:N value types
-    //    private Set<Children> childrens;
-    private Address homeAddress; // Embedded objects(aka component)
-    private Address workAddress;
-    private Credit credit; // 1:1~
-    private Set<Role> roles = new HashSet<>(); // N:M
-    private List<ToDo> toDoSet = new LinkedList<>(); // 1:N(B)(INX)
 
     public Account() {
     }
@@ -198,135 +194,6 @@ public class Account extends VersionEntity {
         this.description = description;
     }
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "PID_DEPARTMENT", foreignKey = @ForeignKey(name = "FK_ACCOUNT_DEPARTMENT"))
-    @Fetch(FetchMode.SELECT)
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
-    @ElementCollection(targetClass = String.class, fetch = FetchType.LAZY)
-    @CollectionTable(
-            name = "TELEPHONE",
-            joinColumns = @JoinColumn(name = "PID_ACCOUNT",
-                    foreignKey = @ForeignKey(name = "FK_ACCOUNT_TELEPHONE"))
-    )
-    @Column(name = "TELEPHONE")
-    public Set<String> getTelephones() {
-        return telephones;
-    }
-
-    public void setTelephones(Set<String> telephones) {
-        this.telephones = telephones;
-    }
-
-//    @ElementCollection(fetch = FetchType.LAZY)
-//    @CollectionTable(
-//            name = "CHILDREN",
-//            joinColumns = @JoinColumn(name = "PID_ACCOUNT",
-//                    foreignKey = @ForeignKey(name = "FK_ACCOUNT_CHILDREN"))
-//    )
-//    public Set<Children> getChildrens() {
-//        return childrens;
-//    }
-//
-//    public void setChildrens(Set<Children> childrens) {
-//        this.childrens = childrens;
-//    }
-
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "city", column = @Column(name = "HOME_CITY")),
-            @AttributeOverride(name = "street", column = @Column(name = "HOME_STREET")),
-            @AttributeOverride(name = "zipCode", column = @Column(name = "HOME_ZIP_CODE"))
-    })
-    public Address getHomeAddress() {
-        return homeAddress;
-    }
-
-    public void setHomeAddress(Address homeAddress) {
-        this.homeAddress = homeAddress;
-    }
-
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "city", column = @Column(name = "WORK_CITY")),
-            @AttributeOverride(name = "street", column = @Column(name = "WORK_STREET")),
-            @AttributeOverride(name = "zipCode", column = @Column(name = "WORK_ZIP_CODE"))
-    })
-    public Address getWorkAddress() {
-        return workAddress;
-    }
-
-    public void setWorkAddress(Address workAddress) {
-        this.workAddress = workAddress;
-    }
-
-    @OneToOne(cascade = CascadeType.ALL, optional = true)
-    @JoinColumn(name = "PID_CREDIT", nullable = false, updatable = false,
-            foreignKey = @ForeignKey(name = "FK_ACCOUNT_CREDIT"))
-    public Credit getCredit() {
-        return credit;
-    }
-
-    public void setCredit(Credit credit) {
-        this.credit = credit;
-    }
-
-    @ManyToMany(mappedBy = "accounts")
-    @org.hibernate.annotations.ForeignKey(name = "FK_ACCOUNT_ROLE")
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    @Fetch(FetchMode.JOIN)
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
-    public void addRole(Role role) {
-        this.getRoles().add(role);
-        role.getAccounts().add(this);
-    }
-
-    public void removeRole(Role role) {
-        this.getRoles().remove(role);
-        role.getAccounts().remove(this);
-    }
-
-//    @OneToMany(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "PID_ACCOUNT")
-//    @org.hibernate.annotations.ForeignKey(name = "FK_ACCOUNT_ADDRESS_PID")
-//    public Set<Address> getAddressSet() {
-//        return addressSet;
-//    }
-//
-//    public void setAddressSet(Set<Address> addressSet) {
-//        this.addressSet = addressSet;
-//    }
-
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-//    @OrderBy("startDate asc")
-    @OrderColumn(name = "INX_TODO")
-    @IndexedEmbedded
-    public List<ToDo> getToDoSet() {
-        return toDoSet;
-    }
-
-    protected void setToDoSet(List<ToDo> toDoSet) {
-        this.toDoSet = toDoSet;
-    }
-
-    public void addToDo(ToDo todo) {
-        this.getToDoSet().add(todo);
-        todo.setAccount(this);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -334,55 +201,36 @@ public class Account extends VersionEntity {
 
         Account account = (Account) o;
 
-        if (username != null ? !username.equals(account.username) : account.username != null)
+        if (getUsername() != null ? !getUsername().equals(account.getUsername()) : account.getUsername() != null)
             return false;
-        if (password != null ? !password.equals(account.password) : account.password != null)
+        if (getPassword() != null ? !getPassword().equals(account.getPassword()) : account.getPassword() != null)
             return false;
-        if (firstName != null ? !firstName.equals(account.firstName) : account.firstName != null)
+        if (getFirstName() != null ? !getFirstName().equals(account.getFirstName()) : account.getFirstName() != null)
             return false;
-        if (lastName != null ? !lastName.equals(account.lastName) : account.lastName != null)
+        if (getLastName() != null ? !getLastName().equals(account.getLastName()) : account.getLastName() != null)
             return false;
-        if (gender != account.gender) return false;
-        if (email != null ? !email.equals(account.email) : account.email != null) return false;
-        if (salary != null ? !salary.equals(account.salary) : account.salary != null) return false;
-        if (yearEndBonus != null ? !yearEndBonus.equals(account.yearEndBonus) : account.yearEndBonus != null)
+        if (getGender() != account.getGender()) return false;
+        if (getEmail() != null ? !getEmail().equals(account.getEmail()) : account.getEmail() != null) return false;
+        if (getSalary() != null ? !getSalary().equals(account.getSalary()) : account.getSalary() != null) return false;
+        if (getYearEndBonus() != null ? !getYearEndBonus().equals(account.getYearEndBonus()) : account.getYearEndBonus() != null)
             return false;
-        if (photo != null ? !photo.equals(account.photo) : account.photo != null) return false;
-        if (description != null ? !description.equals(account.description) : account.description != null)
-            return false;
-        if (department != null ? !department.equals(account.department) : account.department != null)
-            return false;
-        if (telephones != null ? !telephones.equals(account.telephones) : account.telephones != null)
-            return false;
-        if (homeAddress != null ? !homeAddress.equals(account.homeAddress) : account.homeAddress != null)
-            return false;
-        if (workAddress != null ? !workAddress.equals(account.workAddress) : account.workAddress != null)
-            return false;
-        if (credit != null ? !credit.equals(account.credit) : account.credit != null) return false;
-        if (roles != null ? !roles.equals(account.roles) : account.roles != null) return false;
-        return !(toDoSet != null ? !toDoSet.equals(account.toDoSet) : account.toDoSet != null);
+        if (getPhoto() != null ? !getPhoto().equals(account.getPhoto()) : account.getPhoto() != null) return false;
+        return !(getDescription() != null ? !getDescription().equals(account.getDescription()) : account.getDescription() != null);
 
     }
 
     @Override
     public int hashCode() {
-        int result = username != null ? username.hashCode() : 0;
-        result = 31 * result + (password != null ? password.hashCode() : 0);
-        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
-        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
-        result = 31 * result + (gender != null ? gender.hashCode() : 0);
-        result = 31 * result + (email != null ? email.hashCode() : 0);
-        result = 31 * result + (salary != null ? salary.hashCode() : 0);
-        result = 31 * result + (yearEndBonus != null ? yearEndBonus.hashCode() : 0);
-        result = 31 * result + (photo != null ? photo.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (department != null ? department.hashCode() : 0);
-        result = 31 * result + (telephones != null ? telephones.hashCode() : 0);
-        result = 31 * result + (homeAddress != null ? homeAddress.hashCode() : 0);
-        result = 31 * result + (workAddress != null ? workAddress.hashCode() : 0);
-        result = 31 * result + (credit != null ? credit.hashCode() : 0);
-        result = 31 * result + (roles != null ? roles.hashCode() : 0);
-        result = 31 * result + (toDoSet != null ? toDoSet.hashCode() : 0);
+        int result = getUsername() != null ? getUsername().hashCode() : 0;
+        result = 31 * result + (getPassword() != null ? getPassword().hashCode() : 0);
+        result = 31 * result + (getFirstName() != null ? getFirstName().hashCode() : 0);
+        result = 31 * result + (getLastName() != null ? getLastName().hashCode() : 0);
+        result = 31 * result + (getGender() != null ? getGender().hashCode() : 0);
+        result = 31 * result + (getEmail() != null ? getEmail().hashCode() : 0);
+        result = 31 * result + (getSalary() != null ? getSalary().hashCode() : 0);
+        result = 31 * result + (getYearEndBonus() != null ? getYearEndBonus().hashCode() : 0);
+        result = 31 * result + (getPhoto() != null ? getPhoto().hashCode() : 0);
+        result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
         return result;
     }
 }

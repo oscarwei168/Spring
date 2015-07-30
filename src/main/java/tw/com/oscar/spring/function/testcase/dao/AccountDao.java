@@ -12,7 +12,6 @@
  */
 package tw.com.oscar.spring.function.testcase.dao;
 
-import com.googlecode.genericdao.dao.hibernate.GenericDAO;
 import tw.com.oscar.spring.domain.Account;
 
 import java.util.stream.Stream;
@@ -34,7 +33,7 @@ import java.util.stream.Stream;
  * @version v1, 2015/7/27
  * @since 2015/7/27
  */
-public interface AccountDao extends GenericDAO<Account, Long> {
+public interface AccountDao extends com.googlecode.genericdao.dao.hibernate.GenericDAO<Account, Long> {
 
     Stream<Account> findByName(String name);
 }

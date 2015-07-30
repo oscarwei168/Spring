@@ -16,11 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import tw.com.oscar.spring.function.testcase.service.AccountService;
 import tw.com.oscar.spring.util.annotation.Log;
 
@@ -45,6 +47,7 @@ import java.util.Locale;
  */
 @Controller
 @RequestMapping("/account")
+// @Secured("ROLE_USER")
 public class AccountController {
 
     // @Log
@@ -56,13 +59,14 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-    @RequestMapping(value = "/{pid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.OK)
     @Log
-    public String getAccount(@PathVariable String pid, Model model, Locale locale) {
+    public String getAccount(@PathVariable Long id, Model model, Locale locale) {
         String msg = messageSource.getMessage("app.title", null, locale);
         LOGGER.info("Account message : {}", msg);
         model.addAttribute("check", "value");
-        model.addAttribute("accounts", accountService.findAll());
+        model.addAttribute("accounts", accountService.findByPid(id));
         return "index";
     }
 }

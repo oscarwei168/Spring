@@ -1,6 +1,7 @@
-package tw.com.oscar.spring.domain;
+package tw.com.oscar.spring.domain.commons;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import tw.com.oscar.spring.domain.commons.BaseEntity;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
