@@ -12,13 +12,12 @@
  */
 package tw.com.oscar.spring.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.hibernate.annotations.*;
+import org.hibernate.annotations.ForeignKey;
 import org.hibernate.search.annotations.*;
-import org.hibernate.search.annotations.Parameter;
 import org.hibernate.validator.constraints.Email;
 import tw.com.oscar.spring.domain.commons.VersionEntity;
 import tw.com.oscar.spring.domain.enums.Gender;
@@ -28,11 +27,15 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>
@@ -61,12 +64,12 @@ import java.sql.Clob;
 @Where(clause = "1 = 1")
 @NamedQuery(name = Account.SQL_ACCOUNT_FIND_BY_EMAIL, query = "FROM Account a WHERE a.email = :email")
 @Indexed
-@AnalyzerDef(name = "customanalyzer",
+@AnalyzerDef(name = "accountAnalyzer",
         tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
         filters = {
                 @TokenFilterDef(factory = LowerCaseFilterFactory.class),
                 @TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
-                        @Parameter(name = "language", value = "English")
+                        @org.hibernate.search.annotations.Parameter(name = "language", value = "English")
                 })
         })
 public class Account extends VersionEntity {
@@ -74,16 +77,24 @@ public class Account extends VersionEntity {
     public static final String SQL_ACCOUNT_FIND_BY_EMAIL = "accountFindByEmail";
 
     private String username;
-    @JsonIgnore
+    // @JsonIgnore
     private String password;
     private String firstName;
     private String lastName;
     private Gender gender = Gender.MALE;
+    private LocalDate birthday;
     private String email;
     private BigDecimal salary;
     private BigDecimal yearEndBonus;
     private Blob photo;
     private Clob description;
+    private boolean enabled;
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+
+    private AccountLoginAttempt accountLoginAttempt;
+    private Set<Role> roles = new HashSet<Role>(0);
 
     public Account() {
     }
@@ -93,7 +104,7 @@ public class Account extends VersionEntity {
     @Size(min = 5, max = 50)
     @NaturalId
     @Field(index = org.hibernate.search.annotations.Index.YES, analyze = Analyze.YES, store = Store.NO)
-    @Analyzer(definition = "customanalyzer")
+    @Analyzer(definition = "accountAnalyzer")
     public String getUsername() {
         return username;
     }
@@ -145,6 +156,16 @@ public class Account extends VersionEntity {
         this.gender = gender;
     }
 
+    @Column(name = "BIRTHDAY")
+    @Type(type = "localDateType")
+    public LocalDate getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
+
     @Column(name = "EMAIL", nullable = false, length = 100)
     @Email
     @Size(max = 100)
@@ -157,6 +178,7 @@ public class Account extends VersionEntity {
     }
 
     @Column(name = "SALARY", nullable = false, scale = 2)
+    @Digits(integer = 8, fraction = 2)
     public BigDecimal getSalary() {
         return salary;
     }
@@ -194,43 +216,61 @@ public class Account extends VersionEntity {
         this.description = description;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Account account = (Account) o;
-
-        if (getUsername() != null ? !getUsername().equals(account.getUsername()) : account.getUsername() != null)
-            return false;
-        if (getPassword() != null ? !getPassword().equals(account.getPassword()) : account.getPassword() != null)
-            return false;
-        if (getFirstName() != null ? !getFirstName().equals(account.getFirstName()) : account.getFirstName() != null)
-            return false;
-        if (getLastName() != null ? !getLastName().equals(account.getLastName()) : account.getLastName() != null)
-            return false;
-        if (getGender() != account.getGender()) return false;
-        if (getEmail() != null ? !getEmail().equals(account.getEmail()) : account.getEmail() != null) return false;
-        if (getSalary() != null ? !getSalary().equals(account.getSalary()) : account.getSalary() != null) return false;
-        if (getYearEndBonus() != null ? !getYearEndBonus().equals(account.getYearEndBonus()) : account.getYearEndBonus() != null)
-            return false;
-        if (getPhoto() != null ? !getPhoto().equals(account.getPhoto()) : account.getPhoto() != null) return false;
-        return !(getDescription() != null ? !getDescription().equals(account.getDescription()) : account.getDescription() != null);
-
+    @Column(name = "ENABLED", nullable = false)
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    @Override
-    public int hashCode() {
-        int result = getUsername() != null ? getUsername().hashCode() : 0;
-        result = 31 * result + (getPassword() != null ? getPassword().hashCode() : 0);
-        result = 31 * result + (getFirstName() != null ? getFirstName().hashCode() : 0);
-        result = 31 * result + (getLastName() != null ? getLastName().hashCode() : 0);
-        result = 31 * result + (getGender() != null ? getGender().hashCode() : 0);
-        result = 31 * result + (getEmail() != null ? getEmail().hashCode() : 0);
-        result = 31 * result + (getSalary() != null ? getSalary().hashCode() : 0);
-        result = 31 * result + (getYearEndBonus() != null ? getYearEndBonus().hashCode() : 0);
-        result = 31 * result + (getPhoto() != null ? getPhoto().hashCode() : 0);
-        result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
-        return result;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
+
+    @Column(name = "ACCOUNT_NON_EXPIRED", nullable = false)
+    public boolean isAccountNonExpired() {
+        return accountNonExpired;
+    }
+
+    public void setAccountNonExpired(boolean accountNonExpired) {
+        this.accountNonExpired = accountNonExpired;
+    }
+
+    @Column(name = "ACCOUNT_NON_LOCKED", nullable = false)
+    public boolean isAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    public void setAccountNonLocked(boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
+    }
+
+    @Column(name = "CREDENTIALS_NON_EXPIRED", nullable = false)
+    public boolean isCredentialsNonExpired() {
+        return credentialsNonExpired;
+    }
+
+    public void setCredentialsNonExpired(boolean credentialsNonExpired) {
+        this.credentialsNonExpired = credentialsNonExpired;
+    }
+
+    @OneToOne
+    @PrimaryKeyJoinColumn
+    public AccountLoginAttempt getAccountLoginAttempt() {
+        return accountLoginAttempt;
+    }
+
+    public void setAccountLoginAttempt(AccountLoginAttempt accountLoginAttempt) {
+        this.accountLoginAttempt = accountLoginAttempt;
+    }
+
+    @ManyToMany(mappedBy = "accounts")
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @ForeignKey(name = "FK_ACCOUNT_ROLE")
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
 }

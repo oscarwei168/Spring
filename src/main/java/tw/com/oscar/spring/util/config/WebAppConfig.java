@@ -138,7 +138,8 @@ class WebAppConfig extends WebMvcConfigurationSupport {
         resolver.setSuffix(".html");
         resolver.setTemplateMode("HTML5"); // XHTML is default
         resolver.setOrder(1);
-        resolver.setCacheable(false); // default is true
+        resolver.setCacheable(true); // default is true
+        // if not set, entries would be cached until expelled by LRU
         resolver.setCacheTTLMs(1800000L); // 0.5 hour
         return resolver;
     }

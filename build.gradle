@@ -1,3 +1,7 @@
+//plugins {
+//    id "org.akhikhl.gretty" version "1.2.4"
+//}
+
 group 'tw.com.oscar.spring'
 version '1.0-SNAPSHOT'
 
@@ -6,6 +10,7 @@ apply plugin: 'scala'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'war'
+apply plugin: 'jacoco'
 apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
 
 sourceCompatibility = 1.8
@@ -25,6 +30,8 @@ javadoc {
 gretty {
     servletContainer = 'tomcat8'
     httpPort = 9090
+    // debugPort = 9999
+    debugSuspend = false
     contextPath = '/oscarspring'
     managedClassReload = false
     scanInterval = 0
@@ -32,6 +39,7 @@ gretty {
     consoleLogEnabled = true
     fileLogEnabled = true
     logFileName = 'oscar-spring'
+    // springBoot = true
     // logDir = '/Users/oscarwei168/logs'
     // baseDir = '/Users/oscarwei168/IdeaProjects/OscarSpring/build/serverBaseDir_tomcat8'
     // jvmArgs = []
@@ -51,6 +59,7 @@ dependencies {
 
     def springVersion = '4.1.7.RELEASE'
     def springSecurityVersion = '3.2.8.RELEASE'
+    def springBatchVersion = '3.0.4.RELEASE'
 
     def hibernateVersion = '4.3.10.Final'
     def hibernateSearchVersion = '5.3.0.Final'
@@ -58,9 +67,11 @@ dependencies {
 
     def mysqlVersion = '5.1.36'
     def h2Version = '1.4.187'
+    def mongodbVersion = '1.7.2.RELEASE'
 
     def injectVersion = '1'
-    def hibernatGenericDaoVersion = '1.2.0'
+    def guiceVersion = '4.0'
+    def hibernateGenericDaoVersion = '1.2.0'
     def ehcacheVersion = '2.6.11'
     def cglibVersion = '3.1'
     def googleGuavaVersion = '18.0'
@@ -72,22 +83,23 @@ dependencies {
     def freemarkerVersion = '2.3.23'
     def quartzVersion = '2.2.1'
 
-    def thymeleafVersion = '2.1.4.RELEASE'
+    def thymeleafVersion = '2.1.db4.RELEASE'
     def thymeleafExtrasVersion = '2.1.1.RELEASE'
     def thymeleafLayoutDialect = '1.2.7'
     def bootstrapVersion = '3.3.2'
-    def jacksonVersion = '2.1.1'
+    def jacksonVersion = '2.6.0'
     def servletVersion = '3.1.0'
     def jstlVersion = '1.2'
 
     def slf4jVersion = '1.7.12'
     def logbackVersion = '1.1.3'
 
-    def junitVersion = '4.12'
+    // def junitVersion = '4.12'
     def testngVersion = '6.9.6'
     def mockitoVersion = '1.10.19'
     def hamcrestVersion = '1.3'
-    def dbUnitVersion = '2.2'
+    def dbUnitVersion = '2.5.1'
+    def javaelVersion = '2.2'
 
     // programming language
     compile "org.codehaus.groovy:groovy-all:$groovyVersion"
@@ -101,6 +113,8 @@ dependencies {
     compile "org.springframework:spring-oxm:$springVersion"
     compile "org.springframework:spring-messaging:$springVersion"
     compile "org.springframework:spring-websocket:$springVersion"
+    compile "org.springframework.data:spring-data-mongodb:$mongodbVersion"
+    compile "org.springframework.batch:spring-batch-core:$springBatchVersion"
 
     // spring security
     compile "org.springframework.security:spring-security-web:$springSecurityVersion"
@@ -127,7 +141,8 @@ dependencies {
 
     // 3-party libraries
     compile "javax.inject:javax.inject:$injectVersion"
-    compile "com.googlecode.genericdao:dao-hibernate:$hibernatGenericDaoVersion"
+    compile "com.google.inject:guice:$guiceVersion"
+    compile "com.googlecode.genericdao:dao-hibernate:$hibernateGenericDaoVersion"
     compile "net.sf.ehcache:ehcache-core:$ehcacheVersion"
     compile "cglib:cglib-nodep:$cglibVersion"
     compile "commons-io:commons-io:$apacheCommonIO"
@@ -155,11 +170,12 @@ dependencies {
 
     // testing
     testCompile "org.springframework:spring-test:$springVersion"
-    testCompile "junit:junit:$junitVersion"
+    // testCompile "junit:junit:$junitVersion"
     testCompile "org.testng:testng:$testngVersion"
     testCompile "org.mockito:mockito-all:$mockitoVersion"
     testCompile "org.hamcrest:hamcrest-core:$hamcrestVersion"
     testCompile "org.hamcrest:hamcrest-library:$hamcrestVersion"
     testCompile "com.h2database:h2:$h2Version"
-    testCompile "dbunit:dbunit:$dbUnitVersion"
+    testCompile "org.dbunit:dbunit:$dbUnitVersion"
+    testCompile "javax.el:el-api:$javaelVersion"
 }

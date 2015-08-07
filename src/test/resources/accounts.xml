@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <account id="1" USERNAME="oscarwei168" PASSWORD="password" FIRST_NAME="Oscar" LAST_NAME="Wei"
+             GENDER="0" EMAIL="oscarwei168@msn.com" SALARY="100000" USER_CREATED="Admin"
+             DATE_CREATED="2015-08-01 00:00:00.000000000"/>
+
+    <account id="2" USERNAME="amyhung" PASSWORD="password" FIRST_NAME="Amy" LAST_NAME="Hung"
+             GENDER="1" EMAIL="amyhung@acer.com" SALARY="100000" USER_CREATED="Admin"
+             DATE_CREATED="2015-08-01 00:00:00.000000000"/>
+</dataset>

@@ -24,7 +24,7 @@ import org.springframework.dao.annotation.PersistenceExceptionTranslationPostPro
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import tw.com.oscar.spring.util.annotation.DevProfile;
+import tw.com.oscar.spring.util.annotations.DevProfile;
 import tw.com.oscar.spring.util.namingstrategy.UpperCaseNamingStrategy;
 
 import java.util.Objects;
@@ -65,6 +65,15 @@ public class HibernateConfig {
     @Value("${db.password}")
     private String password;
 
+    @Value("${db1.driverClassName}")
+    private String dbDriver;
+    @Value("${db1.url}")
+    private String dbUrl;
+    @Value("${db1.username}")
+    private String dbUsername;
+    @Value("${db1.password}")
+    private String dbPassword;
+
     @Value("${hikari.autoCommit}")
     private boolean autoCommit;
     @Value("${hikari.connectionTimeout}")
@@ -100,6 +109,25 @@ public class HibernateConfig {
     }
 
     /**
+     * A method for obtain second MySQL data source
+     *
+     * @return a MysqlConnectionPoolDataSource object
+     */
+    @Bean
+    @Description("This is second MySQL data source")
+    public MysqlConnectionPoolDataSource mysql2DataSource() {
+        Objects.requireNonNull(dbDriver);
+        Objects.requireNonNull(dbUrl);
+        Objects.requireNonNull(dbUsername);
+        Objects.requireNonNull(dbPassword);
+        MysqlConnectionPoolDataSource ds = new MysqlConnectionPoolDataSource();
+        ds.setUrl(dbUrl);
+        ds.setUser(dbUsername);
+        ds.setPassword(dbPassword);
+        return ds;
+    }
+
+    /**
      * A method for obtain HikariCP data pooling that wrapping Oracle data source internally
      *
      * @return a HikariDataSource object
@@ -108,6 +136,24 @@ public class HibernateConfig {
     public HikariDataSource hikariDataSource() {
         HikariDataSource ds = new HikariDataSource();
         ds.setDataSource(mysqlDataSource());
+        ds.setAutoCommit(autoCommit);
+        ds.setConnectionTimeout(connectionTimeout);
+        ds.setIdleTimeout(idleTimeout);
+        ds.setMaxLifetime(maxLifetime);
+        ds.setMaximumPoolSize(maxPoolSize);
+        ds.setTransactionIsolation(transactionIsolation);
+        return ds;
+    }
+
+    /**
+     * A method for obtain HikariCP data pooling that wrapping Oracle data source internally
+     *
+     * @return a HikariDataSource object
+     */
+    @Bean(destroyMethod = "close")
+    public HikariDataSource hikari2DataSource() {
+        HikariDataSource ds = new HikariDataSource();
+        ds.setDataSource(mysql2DataSource());
         ds.setAutoCommit(autoCommit);
         ds.setConnectionTimeout(connectionTimeout);
         ds.setIdleTimeout(idleTimeout);

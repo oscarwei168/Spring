@@ -19,7 +19,7 @@ import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.orm.hibernate4.support.OpenSessionInViewFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-import tw.com.oscar.spring.util.annotation.Log;
+import tw.com.oscar.spring.util.annotations.Log;
 
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
@@ -84,9 +84,9 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
      */
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        // SecurityConfig.class, JpaConfig.class
+        // BatchConfig.class, JpaConfig.class
         return new Class<?>[] {AppConfig.class, HibernateConfig.class, SecurityConfig.class, CacheConfig.class,
-                MailConfig.class, FreemarkerConfig.class};
+                MailConfig.class, FreemarkerConfig.class, MongoConfig.class};
     }
 
     /**

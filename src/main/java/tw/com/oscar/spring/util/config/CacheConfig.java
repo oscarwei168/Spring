@@ -23,8 +23,8 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import tw.com.oscar.spring.util.annotation.DevProfile;
-import tw.com.oscar.spring.util.annotation.ProdProfile;
+import tw.com.oscar.spring.util.annotations.DevProfile;
+import tw.com.oscar.spring.util.annotations.ProdProfile;
 import tw.com.oscar.spring.util.cache.EnhancedDefaultKeyGenerator;
 
 /**

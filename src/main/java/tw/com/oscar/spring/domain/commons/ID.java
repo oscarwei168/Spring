@@ -54,7 +54,7 @@ class ID {
      *
      * @param id a id value
      */
-    private void setId(Long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 }

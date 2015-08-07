@@ -10,7 +10,7 @@
             </run>
         </groups>
         <packages>
-            <package name="tw.com.oscar.spring.test.account"/>
+            <package name="tw.com.oscar.spring.test.controller.account"/>
         </packages>
     </test>
 </suite>

@@ -15,7 +15,7 @@ package tw.com.oscar.spring.util.formatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.Formatter;
 import tw.com.oscar.spring.domain.Account;
-import tw.com.oscar.spring.function.testcase.service.AccountService;
+import tw.com.oscar.spring.service.account.AccountService;
 
 import java.text.ParseException;
 import java.util.Locale;
@@ -62,7 +62,7 @@ public class AccountFormatter implements Formatter<Account> {
     public Account parse(String text, Locale locale) throws ParseException {
         Objects.requireNonNull(text);
         long id = Long.parseLong(text);
-        return accountService.findByPid(id).get();
+        return accountService.findById(id).get();
     }
 
     /**

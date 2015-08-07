@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.util.ReflectionUtils;
-import tw.com.oscar.spring.util.annotation.Log;
+import tw.com.oscar.spring.util.annotations.Log;
 
 /**
  * <p>
