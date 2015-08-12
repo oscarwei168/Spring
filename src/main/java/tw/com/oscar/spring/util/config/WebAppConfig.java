@@ -43,6 +43,7 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.support.RequestDataValueProcessor;
+import org.thymeleaf.cache.StandardCacheManager;
 import org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect;
 import org.thymeleaf.extras.tiles2.dialect.TilesDialect;
 import org.thymeleaf.extras.tiles2.spring4.web.configurer.ThymeleafTilesConfigurer;
@@ -137,10 +138,17 @@ class WebAppConfig extends WebMvcConfigurationSupport {
         resolver.setPrefix(VIEW);
         resolver.setSuffix(".html");
         resolver.setTemplateMode("HTML5"); // XHTML is default
-        resolver.setOrder(1);
+        resolver.setOrder(1); // for multiple template resolver priority
+
+
         resolver.setCacheable(true); // default is true
         // if not set, entries would be cached until expelled by LRU
         resolver.setCacheTTLMs(1800000L); // 0.5 hour
+        // resolver.getCacheablePatternSpec().addPattern("/users/*");
+        // resolver.getXmlTemplateModePatternSpec().addPattern("*.xhtml");
+        // resolver.setCharacterEncoding(CharEncoding.UTF_8);
+        // resolver.addTemplateAlias("adminHome", "profiles/admin/home");
+        // resolver.setTemplateAliases(new HashMap<>());
         return resolver;
     }
 
@@ -152,6 +160,9 @@ class WebAppConfig extends WebMvcConfigurationSupport {
     @Bean
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine engine = new SpringTemplateEngine();
+        StandardCacheManager cacheManager = new StandardCacheManager();
+        cacheManager.setTemplateCacheMaxSize(100); // default is 50
+        engine.setCacheManager(cacheManager);
         engine.addTemplateResolver(templateResolver());
         engine.addDialect(new SpringSecurityDialect());
         engine.addDialect(new TilesDialect());

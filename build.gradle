@@ -42,7 +42,7 @@ gretty {
     // springBoot = true
     // logDir = '/Users/oscarwei168/logs'
     // baseDir = '/Users/oscarwei168/IdeaProjects/OscarSpring/build/serverBaseDir_tomcat8'
-    // jvmArgs = []
+    jvmArgs = ["-Xmx2048m"]
 }
 
 // war file name, it will be created in build/libs/
@@ -57,11 +57,11 @@ dependencies {
     def groovyVersion = '2.3.11'
     def scalaVersion = '2.11.7'
 
-    def springVersion = '4.1.7.RELEASE'
+    def springVersion = '4.2.0.RELEASE'
     def springSecurityVersion = '3.2.8.RELEASE'
     def springBatchVersion = '3.0.4.RELEASE'
 
-    def hibernateVersion = '4.3.10.Final'
+    def hibernateVersion = '4.3.11.Final'
     def hibernateSearchVersion = '5.3.0.Final'
     def hibernateValidatorVersion = '5.2.0.Final'
 
@@ -82,8 +82,9 @@ dependencies {
     def hikariCpVersion = '2.3.9'
     def freemarkerVersion = '2.3.23'
     def quartzVersion = '2.2.1'
+    def lombokVersion = '1.16.4'
 
-    def thymeleafVersion = '2.1.db4.RELEASE'
+    def thymeleafVersion = '2.1.4.RELEASE'
     def thymeleafExtrasVersion = '2.1.1.RELEASE'
     def thymeleafLayoutDialect = '1.2.7'
     def bootstrapVersion = '3.3.2'
@@ -156,6 +157,7 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
     compile "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    compile "org.projectlombok:lombok:$lombokVersion"
 
     // jdbc driver
     // compile "com.oracle:ojdbc6:$oracleVersion"

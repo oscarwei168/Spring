@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
 </head>
@@ -15,7 +15,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="index.html">Acer Internal Project v0.0.1</a>
+        <a class="navbar-brand" href="index.html" th:text="#{app.title}">Acer Internal Project v0.0.1</a>
     </div>
     <!-- /.navbar-header -->
 

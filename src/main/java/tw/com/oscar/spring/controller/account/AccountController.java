@@ -21,14 +21,13 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import tw.com.oscar.spring.domain.Account;
 import tw.com.oscar.spring.service.account.AccountService;
-import tw.com.oscar.spring.util.annotations.Log;
-import tw.com.oscar.spring.util.validator.AccountValidator;
+import tw.com.oscar.spring.vo.Quote;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -67,8 +66,8 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-    @Autowired
-    private AccountValidator accountValidator;
+//    @Autowired
+//    private AccountValidator accountValidator;
 
     /**
      * Export common account listing
@@ -93,17 +92,6 @@ public class AccountController {
     }
 
     /**
-     * A method used for binding AccountValidator validator
-     *
-     * @param binder a WebDataBinder object
-     */
-    @InitBinder("account")
-    protected void initBinder(WebDataBinder binder) {
-        LOGGER.info("[Enter] AccountController.initBinder");
-        binder.setValidator(accountValidator);
-    }
-
-    /**
      * Binding request parameters to method parameters with @PathValue annotation sample
      *
      * @param id     a request parameter named id
@@ -113,7 +101,6 @@ public class AccountController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
-    @Log
     public String getAccount(@PathVariable Long id, Model model, Locale locale) {
         String msg = messageSource.getMessage("app.title", null, locale);
         LOGGER.info("Account message : {}", msg);
@@ -158,5 +145,16 @@ public class AccountController {
 
         redirectAttributes.addFlashAttribute("message", "message here...");
         return "redirect:/index";
+    }
+
+    /**
+     * A handler used for consuming a RESTful web service
+     */
+    @RequestMapping("/consume")
+    public String consumeAccount() {
+        RestTemplate restTemplate = new RestTemplate();
+        Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+        LOGGER.info("" + quote);
+        return "index";
     }
 }

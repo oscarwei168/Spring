@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
     <meta charset="UTF-8"/>
 </head>
 <body>
@@ -38,7 +38,7 @@
                 <a href="tables.html"><i class="fa fa-table fa-fw"></i> Tables</a>
             </li>
             <li>
-                <a href="forms.html"><i class="fa fa-edit fa-fw"></i> Forms</a>
+                <a href="forms.html" th:href="@{/thymeleaf}"><i class="fa fa-edit fa-fw"></i> Forms</a>
             </li>
             <li>
                 <a href="#"><i class="fa fa-wrench fa-fw"></i> UI Elements<span
@@ -101,7 +101,10 @@
                         class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
                     <li>
-                        <a href="blank.html">Blank Page</a>
+                        <a href="thymeleaf.html" th:href="@{/thymeleaf}">Thymeleaf Template Engine</a>
+                    </li>
+                    <li>
+                        <a href="springmvc.html">Spring MVC</a>
                     </li>
                     <li>
                         <a href="login.html">Login Page</a>

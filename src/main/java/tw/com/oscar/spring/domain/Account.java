@@ -94,8 +94,11 @@ public class Account extends VersionEntity {
     private boolean credentialsNonExpired;
 
     private AccountLoginAttempt accountLoginAttempt;
-    private Set<Role> roles = new HashSet<Role>(0);
+    private Set<Role> roles = new HashSet<>(0);
 
+    /**
+     * A default constructor
+     */
     public Account() {
     }
 

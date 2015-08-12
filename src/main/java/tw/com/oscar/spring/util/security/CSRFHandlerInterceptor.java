@@ -1,6 +1,6 @@
 /**
  * CSRFHandlerInterceptor.java
- * Title: DTS Project
+ * Title: Oscar Wei Web Project
  * Copyright: Copyright(c)2015, oscarwei168
  *
  * @author Oscar Wei
@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 public class CSRFHandlerInterceptor extends HandlerInterceptorAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSRFHandlerInterceptor.class);
+    private static final String METHOD_POST = "POST";
 
     /**
      * A method for validating session/request token before processing request
@@ -52,22 +53,22 @@ public class CSRFHandlerInterceptor extends HandlerInterceptorAdapter {
      *                   <ul><li>If any exception occurred</li></ul>
      */
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws
-            Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
 
-        LOGGER.info("[Enter] CSRFHandlerInterceptor.preHandle()");
-        if (!request.getMethod().equalsIgnoreCase("POST")) {
+        // LOGGER.info("[Enter] CSRFHandlerInterceptor.preHandle()");
+        if (!request.getMethod().equalsIgnoreCase(METHOD_POST)) {
             return true;
         } else {
             String sessionToken = CSRFTokenManager.getTokenForSession(request.getSession());
             String requestToken = CSRFTokenManager.getTokenFromRequest(request);
-            LOGGER.info("Session token : {}", sessionToken);
-            LOGGER.info("Request token : {}", requestToken);
+            LOGGER.info("CSRF session token : {}", sessionToken);
+            LOGGER.info("CSRF request token : {}", requestToken);
             if (sessionToken.equals(requestToken)) {
                 return true;
             } else {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Bad or missing CSRF value");
-                return true; // TODO need to false
+                return false;
             }
         }
     }
@@ -85,6 +86,6 @@ public class CSRFHandlerInterceptor extends HandlerInterceptorAdapter {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         super.postHandle(request, response, handler, modelAndView);
-        LOGGER.info("[End] CSRFHandlerInterceptor.postHandle()");
+        // LOGGER.info("[End] CSRFHandlerInterceptor.postHandle()");
     }
 }
