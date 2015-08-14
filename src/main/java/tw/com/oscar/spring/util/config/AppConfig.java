@@ -50,7 +50,7 @@ import tw.com.oscar.spring.util.aspect.LoggingBeanPostProcessor;
 @EnableAsync
 @EnableScheduling
 @EnableAspectJAutoProxy
-@Order(1)
+@Order(2)
 @ComponentScan(basePackageClasses = Application.class,
         excludeFilters = @ComponentScan.Filter({Controller.class, Configuration.class}))
 public class AppConfig {

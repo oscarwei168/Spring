@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Error Page</title>
+    <link rel="stylesheet" media="all"
+          href="../../../resources/bootstrap/dist/css/bootstrap.min.css"
+          th:href="@{/resources/bootstrap/dist/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div class="container">
+    <p>Error Page</p>
+    <span class="messageContainer" th:unless="${#strings.isEmpty(errorMessage)}" th:text="#{${errorMessage}}"></span>
+</div>
+</body>
+</html>

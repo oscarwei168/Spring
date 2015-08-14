@@ -27,7 +27,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import tw.com.oscar.spring.domain.Account;
 import tw.com.oscar.spring.service.account.AccountService;
-import tw.com.oscar.spring.vo.Quote;
+import tw.com.oscar.spring.util.pojo.vo.Quote;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -149,12 +149,20 @@ public class AccountController {
 
     /**
      * A handler used for consuming a RESTful web service
+     *
+     * @return a uri
      */
     @RequestMapping("/consume")
     public String consumeAccount() {
         RestTemplate restTemplate = new RestTemplate();
         Quote quote = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", Quote.class);
+        // String url = "http://localhost:9090/oscarspring/account/{id}";
+        // Map<String, String> params = new HashMap<>();
+        // params.put("id", "1");
+        // Quote quote = restTemplate.getForObject(url, Quote.class, params);
         LOGGER.info("" + quote);
         return "index";
     }
+
+
 }

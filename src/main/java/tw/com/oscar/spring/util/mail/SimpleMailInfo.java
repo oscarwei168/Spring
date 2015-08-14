@@ -16,6 +16,8 @@
 package tw.com.oscar.spring.util.mail;
 
 import com.google.common.base.MoreObjects;
+import org.slf4j.Logger;
+import tw.com.oscar.spring.util.annotations.Log;
 import tw.com.oscar.spring.util.mail.exception.OscarMailException;
 
 import java.io.File;
@@ -44,6 +46,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2015/7/2
  */
 public class SimpleMailInfo implements MailInfo, Serializable {
+
+    @Log
+    Logger LOGGER;
     
     /**
      * The properties definition
@@ -619,6 +624,13 @@ public class SimpleMailInfo implements MailInfo, Serializable {
      */
     public File[] getAttachment() {
         return attachment;
+    }
+
+    /**
+     * A method invoked by spring by default
+     */
+    public void close() {
+        LOGGER.info("[Enter] SimpleMailInfo.close");
     }
     
     /**

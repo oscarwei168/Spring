@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Description;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
@@ -133,6 +134,7 @@ public class HibernateConfig {
      * @return a HikariDataSource object
      */
     @Bean(destroyMethod = "close")
+    @DependsOn("mysqlDataSource")
     public HikariDataSource hikariDataSource() {
         HikariDataSource ds = new HikariDataSource();
         ds.setDataSource(mysqlDataSource());

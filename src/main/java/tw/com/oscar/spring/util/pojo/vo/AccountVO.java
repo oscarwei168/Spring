@@ -10,7 +10,7 @@
  * 2015/8/8 Oscar Wei v1
  * + File created
  */
-package tw.com.oscar.spring.vo;
+package tw.com.oscar.spring.util.pojo.vo;
 
 import com.google.common.base.MoreObjects;
 

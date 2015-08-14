@@ -15,6 +15,7 @@ package tw.com.oscar.spring.util.config;
 import org.apache.commons.lang.CharEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.orm.hibernate4.support.OpenSessionInViewFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -47,6 +48,7 @@ import javax.servlet.ServletRegistration;
  * @version v1, 2015/7/25
  * @since 2015/7/25
  */
+@Order(1)
 public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebAppInitializer.class);
@@ -117,7 +119,6 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
 
         // TODO Spring security filter
         // DelegatingFilterProxy securityFilterChain = new DelegatingFilterProxy("springSecurityFilterChain");
-
         return new Filter[] {openSessionInViewFilter, characterEncodingFilter};
     }
 

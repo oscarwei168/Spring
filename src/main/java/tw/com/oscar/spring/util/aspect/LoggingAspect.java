@@ -19,16 +19,15 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Stream;
 
 /**
  * <p>
  * Title: LoggingAspect.java<br>
  * </p>
  * <strong>Description:</strong> A around logging aspect<br>
- * This function include: - <br>
+ * This function include: - A around aspect used for calculating execution time<br>
  * <p>
  * Copyright: Copyright (c) 2015<br>
  * </p>
@@ -46,8 +45,11 @@ public class LoggingAspect {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggingAspect.class);
 
+    @Value("${app.loggingAspect.enabled}")
+    private boolean enabled;
+
     /**
-     * A arounr logging interceptor
+     * A around logging interceptor
      *
      * @param joinPoint a JoinPoint object
      * @return the original respect value
@@ -56,25 +58,43 @@ public class LoggingAspect {
      */
     @Around(value = "execution(* tw.com.oscar.spring.service..*.*(..))")
     public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        LOGGER.info("Calling " + joinPoint.getSignature().getName() + " method...");
-        Object retVal = joinPoint.proceed();
-        stopWatch.stop();
+        LOGGER.info("Logging aspect enabled : {}", enabled);
+        if (this.enabled) {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            LOGGER.info("Calling " + joinPoint.getSignature().getName() + " method...");
+            Object retVal = joinPoint.proceed();
+            stopWatch.stop();
 
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(joinPoint.getTarget().getClass().getName()).append(".");
-        buffer.append(joinPoint.getSignature().getName()).append("(");
-        Object[] args = joinPoint.getArgs();
-        // for (Object arg : args) {
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(joinPoint.getTarget().getClass().getName()).append(".");
+            buffer.append(joinPoint.getSignature().getName()).append("(");
+            Object[] args = joinPoint.getArgs();
             buffer.append(Joiner.on(", ").join(args));
-        //}
-//        if (args.length > 0) {
-//            buffer.deleteCharAt(buffer.length() - 2);
-//        }
-        buffer.append(")");
-        buffer.append(" execution time : ").append(stopWatch.getTime()).append("ms");
-        LOGGER.info(buffer.toString());
-        return retVal;
+            buffer.append(")");
+            buffer.append(" execution time : ").append(stopWatch.getTime()).append("ms");
+            LOGGER.info(buffer.toString());
+            return retVal;
+        } else {
+            return joinPoint.proceed();
+        }
+    }
+
+    /**
+     * A getter for property 'enabled'
+     *
+     * @return the value of property enabled
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * A setter for property 'enabled'
+     *
+     * @param enabled a value of property 'enabled'
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

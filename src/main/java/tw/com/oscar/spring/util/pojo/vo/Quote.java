@@ -10,7 +10,7 @@
  * 2015/8/12 Oscar Wei v1
  * + File created
  */
-package tw.com.oscar.spring.vo;
+package tw.com.oscar.spring.util.pojo.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

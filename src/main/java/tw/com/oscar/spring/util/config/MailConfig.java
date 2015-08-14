@@ -28,7 +28,6 @@ import tw.com.oscar.spring.util.mail.exception.OscarMailException;
 import java.util.Objects;
 import java.util.Optional;
 
-
 /**
  * <p>
  * Title: MailConfig.java
@@ -86,7 +85,7 @@ public class MailConfig {
      * @return the MailInfo object
      * @throws OscarMailException Throw exception when:<br>If any exception occurred
      */
-    @Bean
+    @Bean(destroyMethod = "close")
     @Scope(value = "prototype")
     @Autowired
     @Description("A mail info bean that has always contains SMTP server info")

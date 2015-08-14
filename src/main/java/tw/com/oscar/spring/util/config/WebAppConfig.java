@@ -26,6 +26,7 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.format.datetime.DateFormatter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Validator;
@@ -34,10 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
@@ -210,6 +208,7 @@ class WebAppConfig extends WebMvcConfigurationSupport {
     public ThymeleafTilesConfigurer tilesConfigurer() {
         ThymeleafTilesConfigurer ttc = new ThymeleafTilesConfigurer();
         ttc.setDefinitions("/WEB-INF/config/tiles-definitions.xml");
+        // ttc.setDefinitions(new String[] {"classpath:tiles/tiles-def.xml"});
         return ttc;
     }
 
@@ -239,18 +238,14 @@ class WebAppConfig extends WebMvcConfigurationSupport {
         return new CSRFRequestDataValueProcessor();
     }
 
-//    @Override
-//    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-//        System.out.println("innnnnxxxx");
-//        //converters.add(responseBodyConverter());
-//        converters.add(new MappingJackson2HttpMessageConverter());
-//
-//    }
-
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        // converters.add(responseBodyConverter());
-        converters.add(new MappingJackson2HttpMessageConverter());
+    /**
+     * A bean for obtaining Jaxb2RootElementHttpMessageConverter object used to JAXB marshal
+     *
+     * @return a Jaxb2RootElementHttpMessageConverter object
+     */
+    @Bean
+    public Jaxb2RootElementHttpMessageConverter jaxb2RootElementHttpMessageConverter() {
+        return new Jaxb2RootElementHttpMessageConverter();
     }
 
 //    @Bean
@@ -259,6 +254,30 @@ class WebAppConfig extends WebMvcConfigurationSupport {
 //        converter.setSupportedMediaTypes(Arrays.asList(new MediaType("application", "json", Charset.forName("UTF-8"))));
 //        return converter;
 //    }
+
+    /**
+     * A method used for registering /login to maping to view name 'login'
+     *
+     * @param registry a ViewControllerRegistry object
+     */
+    @Override
+    protected void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/login").setViewName("login");
+        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    }
+
+    /**
+     * A method used for configure message converter when RESTful controller response
+     *
+     * @param converters list of HttpMessageConverter objects
+     */
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        // converters.add(responseBodyConverter());
+        converters.add(new MappingJackson2HttpMessageConverter());
+        converters.add(jaxb2RootElementHttpMessageConverter());
+    }
+
 
     @Override
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
@@ -318,6 +337,7 @@ class WebAppConfig extends WebMvcConfigurationSupport {
         registry.addFormatter(new DateFormatter());
         registry.addFormatter(new AccountFormatter());
     }
+
 
     /**
      * A controller for favorite icon mapping
