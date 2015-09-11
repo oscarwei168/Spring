@@ -144,6 +144,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests()
+                        //.expressionHandler(null) PermissionEvaluator(AclPermissionEvaluator)
+                .antMatchers("/*", "/index", "/resources/**").permitAll()
+                .antMatchers("/secure/**").hasRole("ADMIN")
+                .antMatchers("/oscar/**").access("hasRole('ADMIN') and hasRole('MANAGER')")
+                //.anyRequest().authenticated()
+                .anyRequest().anonymous()
+                .and()
+                .formLogin().loginPage("/login").loginProcessingUrl("/authenticate").defaultSuccessUrl("/index")
+                .successHandler(authenticationSuccessHandler()).permitAll()
+                .and()
+                .logout().logoutUrl("/logout").deleteCookies("JSESSIONID").invalidateHttpSession(true)
+                .logoutSuccessUrl("/index").permitAll()
+                .and()
+                .rememberMe().tokenRepository(persistentTokenRepository()).tokenValiditySeconds(1209600)
+                .and()
+                .sessionManagement().maximumSessions(1);
+        // invalidSessionUrl("/login?time=1")
+        // .expiredUrl("/login?expired");
+
 //        http.authorizeRequests().antMatchers("/", "/index", "/favicon.ico", "/resources/**", "/signup").permitAll()
 //                .anyRequest().authenticated().and().formLogin().loginPage("/signin").permitAll().failureUrl
 //                ("/signin?error=1").loginProcessingUrl("/authenticate").and().logout().logoutUrl("/logout").permitAll
@@ -185,28 +206,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .sessionManagement()
 //                .invalidSessionUrl("/login?time=1")
 //                .maximumSessions(1);
-
-        http
-                .authorizeRequests()
-                //.expressionHandler(null) PermissionEvaluator(AclPermissionEvaluator)
-                .antMatchers("/*", "/index", "/resources/**").permitAll()
-                .antMatchers("/secure/**").hasRole("ADMIN")
-                .antMatchers("/oscar/**").access("hasRole('ADMIN') and hasRole('MANAGER')")
-                //.anyRequest().authenticated()
-                .anyRequest().anonymous()
-                .and()
-                .formLogin().loginPage("/login").loginProcessingUrl("/authenticate").defaultSuccessUrl("/index")
-                .successHandler(authenticationSuccessHandler()).permitAll()
-                .and()
-                .logout().logoutUrl("/logout").deleteCookies("JSESSIONID")
-                //.invalidateHttpSession(false)
-                .logoutSuccessUrl("/index").permitAll()
-                .and()
-                .rememberMe().tokenRepository(persistentTokenRepository()).tokenValiditySeconds(1209600)
-                .and()
-                .sessionManagement().maximumSessions(1);
-                // invalidSessionUrl("/login?time=1")
-                // .expiredUrl("/login?expired");
     }
 
     /**

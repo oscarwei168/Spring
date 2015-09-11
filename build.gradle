@@ -55,6 +55,7 @@ gretty {
     // baseDir = '/Users/oscarwei168/IdeaProjects/OscarSpring/build/serverBaseDir_tomcat8'
     jvmArgs = [
             '-Drebel.base=/Users/oscarwei168/.jrebel',
+            '-Drebel.notification.url=http://localhost:50618',
             '-Drebel.workspace.path=/Users/oscarwei168/IdeaProjects',
             '-Drebel.properties=/Users/oscarwei168/.jrebel/jrebel.properties',
             '-agentpath:/Applications/jbdevstudio/studio/plugins/org.zeroturnaround.eclipse.embedder_6.2.3.RELEASE-201508181656/jr6/jrebel/lib/libjrebel64.dylib',
@@ -71,7 +72,7 @@ war.archiveName 'oscarspring.war'
 
 rebel {
     alwaysGenerate = false
-    showGenerated = true
+    showGenerated = false
     // rebelXmlDirectory = 'build/classes'
 }
 
