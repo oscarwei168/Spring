@@ -13,6 +13,9 @@
 package tw.com.oscar.spring.util.config;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.ServerAddress;
+import com.mongodb.WriteConcern;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mapping.context.MappingContext;
@@ -49,7 +52,11 @@ public class MongoConfig {
 
     @Bean
     public MongoDbFactory mongoDbFactory() throws UnknownHostException {
-        MongoClient mongoClient = new MongoClient("localhost", 27017);
+        MongoClientOptions options = MongoClientOptions.builder()
+                .connectionsPerHost(150).connectTimeout(1000 * 10)
+                .writeConcern(WriteConcern.UNACKNOWLEDGED).build();
+        ServerAddress serverAddress = new ServerAddress("127.0.0.1");
+        MongoClient mongoClient = new MongoClient(serverAddress, options);
         // UserCredentials credentials = new UserCredentials("", "");
         return new SimpleMongoDbFactory(mongoClient, "oscar"); // database name
     }

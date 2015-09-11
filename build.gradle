@@ -11,6 +11,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'war'
 apply plugin: 'jacoco'
+apply plugin: 'rebel'
 apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
 
 sourceCompatibility = 1.8
@@ -23,6 +24,16 @@ repositories {
     mavenCentral()
 }
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath group: 'org.zeroturnaround', name: 'gradle-jrebel-plugin', version: '1.1.2'
+    }
+}
+
 javadoc {
     options.addStringOption('XDignore.symbol.file', '-quiet')
 }
@@ -31,7 +42,7 @@ gretty {
     servletContainer = 'tomcat8'
     httpPort = 9090
     // debugPort = 9999
-    debugSuspend = false
+    debugSuspend = true
     contextPath = '/oscarspring'
     managedClassReload = false
     scanInterval = 0
@@ -42,11 +53,27 @@ gretty {
     // springBoot = true
     // logDir = '/Users/oscarwei168/logs'
     // baseDir = '/Users/oscarwei168/IdeaProjects/OscarSpring/build/serverBaseDir_tomcat8'
-    jvmArgs = ["-Xmx2048m"]
+    jvmArgs = [
+            '-Drebel.base=/Users/oscarwei168/.jrebel',
+            '-Drebel.workspace.path=/Users/oscarwei168/IdeaProjects',
+            '-Drebel.properties=/Users/oscarwei168/.jrebel/jrebel.properties',
+            '-agentpath:/Applications/jbdevstudio/studio/plugins/org.zeroturnaround.eclipse.embedder_6.2.3.RELEASE-201508181656/jr6/jrebel/lib/libjrebel64.dylib',
+            '-Xms512m',
+            '-Xmx2048m',
+            '-XX:MaxPermSize=1024m',
+            '-Dspring.profiles.active=dev'
+    ]
 }
 
 // war file name, it will be created in build/libs/
+war.dependsOn generateRebel
 war.archiveName 'oscarspring.war'
+
+rebel {
+    alwaysGenerate = false
+    showGenerated = true
+    // rebelXmlDirectory = 'build/classes'
+}
 
 configurations {
     all*.exclude group: 'commons-logging', module: 'commons-logging'
@@ -58,7 +85,7 @@ dependencies {
     def scalaVersion = '2.11.7'
 
     def springVersion = '4.2.0.RELEASE'
-    def springSecurityVersion = '3.2.8.RELEASE'
+    def springSecurityVersion = '4.0.2.RELEASE' // '3.2.8.RELEASE'
     def springBatchVersion = '3.0.4.RELEASE'
 
     def hibernateVersion = '4.3.11.Final'
@@ -79,13 +106,15 @@ dependencies {
     def apacheCommonIO = '2.4'
     def apacheCommonCollections4= '4.0'
     def apacheCommonEmail = '1.4'
-    def hikariCpVersion = '2.3.9'
+    def hikariCpVersion = '2.4.1'
     def freemarkerVersion = '2.3.23'
     def quartzVersion = '2.2.1'
     def lombokVersion = '1.16.4'
+    def jamonVersion = '2.81'
 
     def thymeleafVersion = '2.1.4.RELEASE'
-    def thymeleafExtrasVersion = '2.1.1.RELEASE'
+    def thymeleafExtrasSecurityVersion = '2.1.2.RELEASE'
+    def thymeleafExtrasTilesVersion = '2.1.1.RELEASE'
     def thymeleafLayoutDialect = '1.2.7'
     def bootstrapVersion = '3.3.2'
     def jacksonVersion = '2.6.0'
@@ -121,6 +150,7 @@ dependencies {
     compile "org.springframework.security:spring-security-web:$springSecurityVersion"
     compile "org.springframework.security:spring-security-config:$springSecurityVersion"
     compile "org.springframework.security:spring-security-ldap:$springSecurityVersion"
+    compile "org.springframework.security:spring-security-acl:$springSecurityVersion"
 
     // hibernate orm
     compile "org.hibernate:hibernate-entitymanager:$hibernateVersion"
@@ -134,9 +164,9 @@ dependencies {
     compile("org.thymeleaf:thymeleaf-spring4:$thymeleafVersion") {
         exclude group: "javassist", module: "org.javassist"
     }
-    compile "org.thymeleaf.extras:thymeleaf-extras-springsecurity3:$thymeleafExtrasVersion"
-    compile "org.thymeleaf.extras:thymeleaf-extras-tiles2:$thymeleafExtrasVersion"
-    compile "org.thymeleaf.extras:thymeleaf-extras-tiles2-spring4:$thymeleafExtrasVersion"
+    compile "org.thymeleaf.extras:thymeleaf-extras-springsecurity4:$thymeleafExtrasSecurityVersion"
+    compile "org.thymeleaf.extras:thymeleaf-extras-tiles2:$thymeleafExtrasTilesVersion"
+    compile "org.thymeleaf.extras:thymeleaf-extras-tiles2-spring4:$thymeleafExtrasTilesVersion"
     compile "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:$thymeleafLayoutDialect"
     compile "org.webjars:bootstrap:$bootstrapVersion"
 
@@ -150,7 +180,7 @@ dependencies {
     compile "org.apache.commons:commons-lang3:$apacheCommonLang3"
     compile "org.apache.commons:commons-collections4:$apacheCommonCollections4"
     compile "org.apache.commons:commons-email:$apacheCommonEmail"
-    compile "com.zaxxer:HikariCP-java6:$hikariCpVersion"
+    compile "com.zaxxer:HikariCP:$hikariCpVersion"
     compile "com.google.guava:guava:$googleGuavaVersion"
     compile "org.freemarker:freemarker:$freemarkerVersion"
     compile "org.quartz-scheduler:quartz:$quartzVersion"
@@ -158,6 +188,7 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     compile "org.projectlombok:lombok:$lombokVersion"
+    compile "com.jamonapi:jamon:$jamonVersion"
 
     // jdbc driver
     // compile "com.oracle:ojdbc6:$oracleVersion"

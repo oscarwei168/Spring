@@ -56,7 +56,6 @@ public class CSRFHandlerInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
 
-        // LOGGER.info("[Enter] CSRFHandlerInterceptor.preHandle()");
         if (!request.getMethod().equalsIgnoreCase(METHOD_POST)) {
             return true;
         } else {
@@ -65,6 +64,7 @@ public class CSRFHandlerInterceptor extends HandlerInterceptorAdapter {
             LOGGER.info("CSRF session token : {}", sessionToken);
             LOGGER.info("CSRF request token : {}", requestToken);
             if (sessionToken.equals(requestToken)) {
+                LOGGER.info("{}", "CSRF token validation successfully...");
                 return true;
             } else {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Bad or missing CSRF value");
@@ -86,6 +86,5 @@ public class CSRFHandlerInterceptor extends HandlerInterceptorAdapter {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         super.postHandle(request, response, handler, modelAndView);
-        // LOGGER.info("[End] CSRFHandlerInterceptor.postHandle()");
     }
 }

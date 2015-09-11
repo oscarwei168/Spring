@@ -17,10 +17,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
@@ -32,6 +34,7 @@ import tw.com.oscar.spring.util.pojo.vo.Quote;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -133,18 +136,22 @@ public class AccountController {
      * @param account            a Account object
      * @param result             a BindingResult object
      * @param redirectAttributes a RedirectAttributes object
-     * @return a uri
+     * @return a ResponseEntity object
      */
     @RequestMapping(method = RequestMethod.POST)
-    public String submit(
+    public ResponseEntity<?> submit(
             @ModelAttribute("account") @Valid Account account, BindingResult result,
             final RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            return "index";
+            List<String> errors =
+                    result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.toList());
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+            // return "index";
         }
 
         redirectAttributes.addFlashAttribute("message", "message here...");
-        return "redirect:/index";
+        // return "redirect:/index";
+        return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
     /**

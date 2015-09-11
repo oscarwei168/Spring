@@ -28,6 +28,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import tw.com.oscar.spring.util.annotations.DevProfile;
 import tw.com.oscar.spring.util.namingstrategy.UpperCaseNamingStrategy;
 
+import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -85,6 +87,12 @@ public class HibernateConfig {
     private long maxLifetime;
     @Value("${hikari.maximumPoolSize}")
     private int maxPoolSize;
+    @Value("${hikari.cachePrepStmts}")
+    private boolean cachePrepStmts;
+    @Value("${hikari.prepStmtCacheSize}")
+    private int prepStmtCacheSize;
+    @Value("${hikari.prepStmtCacheSqlLimit}")
+    private int prepStmtCacheSqlLimit;
     @Value("${hikari.transactionIsolation}")
     private String transactionIsolation;
 
@@ -95,10 +103,12 @@ public class HibernateConfig {
      * A method for obtain MySQL data source
      *
      * @return a MysqlConnectionPoolDataSource object
+     * @throws SQLException throw exception when:<br>
+     *                      <ul><li>prepare statement cache size</li></ul>
      */
     @Bean
     @Description("This is used for MySQL data source")
-    public MysqlConnectionPoolDataSource mysqlDataSource() {
+    public MysqlConnectionPoolDataSource mysqlDataSource() throws SQLException {
         Objects.requireNonNull(url);
         Objects.requireNonNull(username);
         Objects.requireNonNull(password);
@@ -106,6 +116,9 @@ public class HibernateConfig {
         ds.setURL(url);
         ds.setUser(username);
         ds.setPassword(password);
+        ds.setCachePrepStmts(cachePrepStmts);
+        ds.setPreparedStatementCacheSize(prepStmtCacheSize);
+        ds.setPreparedStatementCacheSqlLimit(prepStmtCacheSqlLimit);
         return ds;
     }
 
@@ -113,10 +126,12 @@ public class HibernateConfig {
      * A method for obtain second MySQL data source
      *
      * @return a MysqlConnectionPoolDataSource object
+     * @throws SQLException throw exception when:<br>
+     *                      <ul><li>prepare statement cache size</li></ul>
      */
     @Bean
     @Description("This is second MySQL data source")
-    public MysqlConnectionPoolDataSource mysql2DataSource() {
+    public MysqlConnectionPoolDataSource mysql2DataSource() throws SQLException {
         Objects.requireNonNull(dbDriver);
         Objects.requireNonNull(dbUrl);
         Objects.requireNonNull(dbUsername);
@@ -125,6 +140,9 @@ public class HibernateConfig {
         ds.setUrl(dbUrl);
         ds.setUser(dbUsername);
         ds.setPassword(dbPassword);
+        ds.setCachePrepStmts(cachePrepStmts);
+        ds.setPreparedStatementCacheSize(prepStmtCacheSize);
+        ds.setPreparedStatementCacheSqlLimit(prepStmtCacheSqlLimit);
         return ds;
     }
 
@@ -132,10 +150,11 @@ public class HibernateConfig {
      * A method for obtain HikariCP data pooling that wrapping Oracle data source internally
      *
      * @return a HikariDataSource object
+     * @throws SQLException throw exception when:<br>if any exception occurred
      */
     @Bean(destroyMethod = "close")
     @DependsOn("mysqlDataSource")
-    public HikariDataSource hikariDataSource() {
+    public DataSource dataSource() throws SQLException {
         HikariDataSource ds = new HikariDataSource();
         ds.setDataSource(mysqlDataSource());
         ds.setAutoCommit(autoCommit);
@@ -151,9 +170,10 @@ public class HibernateConfig {
      * A method for obtain HikariCP data pooling that wrapping Oracle data source internally
      *
      * @return a HikariDataSource object
+     * @throws SQLException throw exception when:<br>if any exception occurred
      */
     @Bean(destroyMethod = "close")
-    public HikariDataSource hikari2DataSource() {
+    public HikariDataSource hikari2DataSource() throws SQLException {
         HikariDataSource ds = new HikariDataSource();
         ds.setDataSource(mysql2DataSource());
         ds.setAutoCommit(autoCommit);
@@ -169,11 +189,12 @@ public class HibernateConfig {
      * A method for obtain Hibernate SessionFactory object
      *
      * @return a LocalSessionFactoryBean object
+     * @throws SQLException throw exception when:<br>if any exception occurred
      */
     @Bean
-    public LocalSessionFactoryBean sessionFactory() {
+    public LocalSessionFactoryBean sessionFactory() throws SQLException {
         LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
-        factoryBean.setDataSource(hikariDataSource());
+        factoryBean.setDataSource(dataSource());
         factoryBean.setPackagesToScan(entitymanagerPackagesScan);
         factoryBean.setNamingStrategy(new UpperCaseNamingStrategy());
         factoryBean.setHibernateProperties(hibernateProperties());
@@ -210,6 +231,8 @@ public class HibernateConfig {
     }
 
     /**
+     * A bean to translate exception used by a post-processor
+     *
      * @return a PersistenceExceptionTranslationPostProcessor object
      */
     @Bean

@@ -21,12 +21,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
 import org.springframework.context.annotation.Scope;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import tw.com.oscar.spring.util.mail.SimpleMailInfo;
 import tw.com.oscar.spring.util.mail.SimpleServerInfo;
 import tw.com.oscar.spring.util.mail.exception.OscarMailException;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
 
 /**
  * <p>
@@ -94,5 +96,26 @@ public class MailConfig {
         SimpleMailInfo simpleMailInfo = new SimpleMailInfo();
         simpleMailInfo.setServerInfo(serverInfo);
         return simpleMailInfo;
+    }
+
+    /**
+     * A bean for spring java mail configure
+     *
+     * @return a JavaMailSenderImpl object
+     */
+    @Bean
+    public JavaMailSenderImpl javaMailSender() {
+        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        javaMailSender.setHost("smtp.gmail.com");
+        javaMailSender.setPort(465);
+        javaMailSender.setProtocol("smtps");
+        javaMailSender.setUsername("oscarwei168@gmail.com");
+        javaMailSender.setPassword("");
+
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", true);
+        properties.put("mail.smtp.starttls.enable", true);
+        javaMailSender.setJavaMailProperties(properties);
+        return javaMailSender;
     }
 }

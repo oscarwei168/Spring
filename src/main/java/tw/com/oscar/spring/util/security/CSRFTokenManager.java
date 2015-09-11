@@ -1,6 +1,6 @@
 /**
  * CSRFTokenManager.java
- * Title: DTS Project
+ * Title: Oscar Wei Web Project
  * Copyright: Copyright(c)2015, oscarwei168
  *
  * @author Oscar Wei
@@ -20,7 +20,7 @@ import java.util.UUID;
  * <p>
  * Title: CSRFTokenManager.java
  * </p>
- * <strong>Description:</strong> //TODO <br>
+ * <strong>Description:</strong> A class that managing CSRF token into/from HttpServletRequest/HttpSession object<br>
  * This function include: - <br>
  * <p>
  * Copyright: Copyright (c) 2015
@@ -35,9 +35,15 @@ import java.util.UUID;
  */
 final class CSRFTokenManager {
 
-    static final String CSRF_PARAM_NAME = "CSRFToken";
+    static final String CSRF_PARAM_NAME = "_csrf";
     private final static String CSRF_TOKEN_FOR_SESSION_ATTR_NAME = CSRFTokenManager.class.getName() + ".tokenval";
 
+    /**
+     * A method that will obtaining CSRF token from HttpSession object
+     *
+     * @param session a HttpSession object
+     * @return a CSRF token
+     */
     static String getTokenForSession(HttpSession session) {
         String token;
         synchronized (session) {
@@ -50,10 +56,19 @@ final class CSRFTokenManager {
         return token;
     }
 
+    /**
+     * A method that will obtaining CSRF token from HttpServletRequest object
+     *
+     * @param request a HttpServletRequest object
+     * @return a CSRF token
+     */
     static String getTokenFromRequest(HttpServletRequest request) {
         return request.getParameter(CSRF_PARAM_NAME);
     }
 
+    /**
+     * A private constructor
+     */
     private CSRFTokenManager() {
     }
 }

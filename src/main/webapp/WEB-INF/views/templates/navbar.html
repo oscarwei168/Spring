@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8"/>
+<head th:replace="templates/headMeta :: headMeta">
 </head>
 <body>
 <!-- Navigation -->
@@ -228,9 +227,14 @@
             <!-- /.dropdown-alerts -->
         </li>
         <!-- /.dropdown -->
-        <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+        <li class="dropdown" th:with="currentUser=${#httpServletRequest.userPrincipal?.name}">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#" th:if="${currentUser != null}">
+                <i class="fa fa-user fa-fw"></i>
+                Admin
+                <i class="fa fa-caret-down"></i>
+            </a>
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#" th:if="${currentUser == null}">
+                <i class="fa fa-user fa-fw"></i>Guest <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu dropdown-user">
                 <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
@@ -238,8 +242,18 @@
                 <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
                 </li>
                 <li class="divider"></li>
-                <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                <li><a href="#" th:href="@{/login}" th:if="${#authorization.expression('!isAuthenticated()')}"><i
+                        class="fa fa-gear fa-fw"></i> Login</a>
                 </li>
+                <li><a href="#" th:href="@{/logout}" th:if="${#authorization.expression('isAuthenticated()')}"><i
+                        class="fa fa-gear fa-fw"></i> Logout</a>
+                </li>
+                <!--<li>-->
+                <!--<form method="post" action="#" th:action="@{/logout}"><i class="fa fa-sign-out fa-fw"></i>-->
+                <!--<input type="submit" value="Logout" />-->
+                <!--<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>-->
+                <!--</form>-->
+                <!--</li>-->
             </ul>
             <!-- /.dropdown-user -->
         </li>

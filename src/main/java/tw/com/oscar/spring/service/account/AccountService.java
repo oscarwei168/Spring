@@ -12,7 +12,9 @@
  */
 package tw.com.oscar.spring.service.account;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import tw.com.oscar.spring.domain.Account;
+import tw.com.oscar.spring.domain.AccountLoginAttempt;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -58,4 +60,27 @@ public interface AccountService {
      * @return a Account object
      */
     Optional<Account> findByLoadId(Long id);
+
+    /**
+     * A method used for searching a Account object by username
+     *
+     * @param username a Account username
+     * @return a Account object
+     * @throws UsernameNotFoundException throw exception when:<br>if result count does not equals one
+     */
+    Optional<Account> findByUsername(final String username) throws UsernameNotFoundException;
+
+    /**
+     * A method used to persisting entity to database
+     *
+     * @param entity a Account object
+     */
+    void save(Account entity);
+
+    /**
+     * A method used to persisting entity to database
+     *
+     * @param entity a AccountLoginAttempt object
+     */
+    void save(AccountLoginAttempt entity);
 }

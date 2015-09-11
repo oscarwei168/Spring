@@ -59,11 +59,14 @@ public class AccountValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         Account account = (Account) target;
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "account.filed.empty", "Username");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "firstName", "account.filed.empty", "First Name");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "account.filed.empty", new String[] {"Account",
+                "Username"});
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "firstName", "account.filed.empty", new String[]
+                {"Account", "First Name"});
 
         if (null == account.getSalary()) {
-            errors.rejectValue("salary", "account.filed.empty", "Salary");
+            errors.rejectValue("salary", "account.filed.empty", new String[] {"Account", "Salary"}, "The salary " +
+                    "cannot be empty");
         }
     }
 }

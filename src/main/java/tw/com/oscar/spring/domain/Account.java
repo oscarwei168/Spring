@@ -19,6 +19,7 @@ import org.hibernate.annotations.*;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.search.annotations.*;
 import org.hibernate.validator.constraints.Email;
+import org.springframework.format.annotation.DateTimeFormat;
 import tw.com.oscar.spring.domain.commons.VersionEntity;
 import tw.com.oscar.spring.domain.enums.Gender;
 
@@ -160,6 +161,7 @@ public class Account extends VersionEntity {
     }
 
     @Column(name = "BIRTHDAY")
+    @DateTimeFormat(pattern = "yyyy/MM/dd")
     @Type(type = "localDateType")
     public LocalDate getBirthday() {
         return birthday;

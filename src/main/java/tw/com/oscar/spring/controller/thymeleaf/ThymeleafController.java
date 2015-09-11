@@ -38,7 +38,7 @@ import tw.com.oscar.spring.util.pojo.vo.AccountVO;
  * @since 2015/8/8
  */
 @Controller
-@RequestMapping("/thymeleaf")
+@RequestMapping("/oscar**")
 public class ThymeleafController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThymeleafController.class);
@@ -58,9 +58,9 @@ public class ThymeleafController {
      *
      * @return a uri
      */
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "thymeleaf", method = RequestMethod.GET)
     public String showcase() {
-        return "pages/thymeleaf";
+        return "oscar/thymeleaf";
     }
 
     @RequestMapping(method = RequestMethod.POST)

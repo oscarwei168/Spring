@@ -12,15 +12,15 @@
  */
 package tw.com.oscar.spring.util.config;
 
-import org.apache.commons.lang.CharEncoding;
+import org.apache.commons.lang3.CharEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.orm.hibernate4.support.OpenSessionInViewFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-import tw.com.oscar.spring.util.annotations.Log;
 
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
@@ -61,7 +61,6 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
      *                          <ul><li>if any exception occurred</li></ul>
      */
     @Override
-    @Log
     public void onStartup(ServletContext servletContext) throws ServletException {
         LOGGER.info("[Enter] WebAppInitializer.onStartup");
         super.onStartup(servletContext);
@@ -117,9 +116,10 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
         characterEncodingFilter.setEncoding(CharEncoding.UTF_8);
         characterEncodingFilter.setForceEncoding(true);
 
-        // TODO Spring security filter
+        HiddenHttpMethodFilter hiddenHttpMethodFilter = new HiddenHttpMethodFilter();
+
         // DelegatingFilterProxy securityFilterChain = new DelegatingFilterProxy("springSecurityFilterChain");
-        return new Filter[] {openSessionInViewFilter, characterEncodingFilter};
+        return new Filter[] {openSessionInViewFilter, characterEncodingFilter, hiddenHttpMethodFilter};
     }
 
     /**

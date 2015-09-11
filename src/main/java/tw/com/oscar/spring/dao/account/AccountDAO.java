@@ -19,7 +19,7 @@ import tw.com.oscar.spring.domain.Account;
  * <p>
  * Title: AccountDAO.java<br>
  * </p>
- * <strong>Description:</strong> A account dao definition<br>
+ * <strong>Description:</strong> A Account DAO definition<br>
  * This function include: - <br>
  * <p>
  * Copyright: Copyright (c) 2015<br>

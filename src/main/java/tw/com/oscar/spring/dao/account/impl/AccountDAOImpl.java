@@ -21,7 +21,7 @@ import tw.com.oscar.spring.util.common.dao.BaseDAO;
  * <p>
  * Title: AccountDAO.java<br>
  * </p>
- * <strong>Description:</strong> A account dao concrete implementation<br>
+ * <strong>Description:</strong> A Account DAO concrete implementation<br>
  * This function include: - <br>
  * <p>
  * Copyright: Copyright (c) 2015<br>
@@ -36,8 +36,4 @@ import tw.com.oscar.spring.util.common.dao.BaseDAO;
  */
 @Repository
 public class AccountDAOImpl extends BaseDAO<Account, Long> implements AccountDAO {
-
-//    @Inject
-//    private PasswordEncoder passwordEncoder;
-
 }

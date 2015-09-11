@@ -1,6 +1,6 @@
 /**
  * CSRFRequestDataValueProcessor.java
- * Title: DTS Project
+ * Title: Oscar Wei Web Project
  * Copyright: Copyright(c)2015, oscarwei168
  *
  * @author Oscar Wei
@@ -36,17 +36,17 @@ import java.util.Map;
  * @since 2015/7/25
  */
 public class CSRFRequestDataValueProcessor implements RequestDataValueProcessor {
-    
+
     @Override
     public String processAction(HttpServletRequest request, String action, String httpMethod) {
         return action;
     }
-    
+
     @Override
     public String processFormFieldValue(HttpServletRequest request, String name, String value, String type) {
         return value;
     }
-    
+
     @Override
     public Map<String, String> getExtraHiddenFields(HttpServletRequest request) {
         Map<String, String> hiddenFields = new HashMap<>();
@@ -54,7 +54,7 @@ public class CSRFRequestDataValueProcessor implements RequestDataValueProcessor 
                 CSRFTokenManager.getTokenForSession(request.getSession()));
         return hiddenFields;
     }
-    
+
     @Override
     public String processUrl(HttpServletRequest request, String url) {
         return url;

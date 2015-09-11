@@ -13,7 +13,7 @@
 package tw.com.oscar.spring.util.config;
 
 import nz.net.ultraq.thymeleaf.LayoutDialect;
-import org.apache.commons.lang.CharEncoding;
+import org.apache.commons.lang3.CharEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -23,10 +23,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.Ordered;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.format.datetime.DateFormatter;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Validator;
@@ -40,9 +44,8 @@ import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.springframework.web.servlet.support.RequestDataValueProcessor;
 import org.thymeleaf.cache.StandardCacheManager;
-import org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect;
+import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.extras.tiles2.dialect.TilesDialect;
 import org.thymeleaf.extras.tiles2.spring4.web.configurer.ThymeleafTilesConfigurer;
 import org.thymeleaf.extras.tiles2.spring4.web.view.ThymeleafTilesView;
@@ -52,10 +55,13 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import tw.com.oscar.spring.Application;
 import tw.com.oscar.spring.util.formatter.AccountFormatter;
-import tw.com.oscar.spring.util.security.CSRFHandlerInterceptor;
-import tw.com.oscar.spring.util.security.CSRFRequestDataValueProcessor;
+import tw.com.oscar.spring.util.formatter.DateFormatter;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.Charset;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -137,7 +143,6 @@ class WebAppConfig extends WebMvcConfigurationSupport {
         resolver.setSuffix(".html");
         resolver.setTemplateMode("HTML5"); // XHTML is default
         resolver.setOrder(1); // for multiple template resolver priority
-
 
         resolver.setCacheable(true); // default is true
         // if not set, entries would be cached until expelled by LRU
@@ -232,11 +237,12 @@ class WebAppConfig extends WebMvcConfigurationSupport {
      * Enable security features like protection against CSRF
      *
      * @return The RequestDataValueProcess implementation
+     * @deprecated it is deprecated because spring framework 4 include CSRF token functionality automatically
      */
-    @Bean
-    public RequestDataValueProcessor requestDataValueProcessor() {
-        return new CSRFRequestDataValueProcessor();
-    }
+//    @Bean
+//    public RequestDataValueProcessor requestDataValueProcessor() {
+//        return new CSRFRequestDataValueProcessor();
+//    }
 
     /**
      * A bean for obtaining Jaxb2RootElementHttpMessageConverter object used to JAXB marshal
@@ -248,12 +254,17 @@ class WebAppConfig extends WebMvcConfigurationSupport {
         return new Jaxb2RootElementHttpMessageConverter();
     }
 
-//    @Bean
-//    public HttpMessageConverter<String> responseBodyConverter() {
-//        StringHttpMessageConverter converter = new StringHttpMessageConverter();
-//        converter.setSupportedMediaTypes(Arrays.asList(new MediaType("application", "json", Charset.forName("UTF-8"))));
-//        return converter;
-//    }
+    /**
+     * A spring HttpMessageConverter for handling media type like json, etc.
+     *
+     * @return a HttpMessageConverter object
+     */
+    @Bean
+    public HttpMessageConverter<String> responseBodyConverter() {
+        StringHttpMessageConverter converter = new StringHttpMessageConverter();
+        converter.setSupportedMediaTypes(Arrays.asList(new MediaType("application", "json", Charset.forName("UTF-8"))));
+        return converter;
+    }
 
     /**
      * A method used for registering /login to maping to view name 'login'
@@ -262,7 +273,8 @@ class WebAppConfig extends WebMvcConfigurationSupport {
      */
     @Override
     protected void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/login").setViewName("login");
+        registry.addViewController("/login").setViewName("pages/login");
+        registry.addViewController("/secure/hello").setViewName("secure/hello");
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
 
@@ -273,11 +285,10 @@ class WebAppConfig extends WebMvcConfigurationSupport {
      */
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        // converters.add(responseBodyConverter());
         converters.add(new MappingJackson2HttpMessageConverter());
         converters.add(jaxb2RootElementHttpMessageConverter());
+        // converters.add(responseBodyConverter());
     }
-
 
     @Override
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
@@ -307,6 +318,12 @@ class WebAppConfig extends WebMvcConfigurationSupport {
                 .setCachePeriod(CACHE_PERIOD);
     }
 
+    /**
+     * Enable forwarding to the “default” Servlet. The “default” Servlet is used to handle static content such as
+     * CSS, HTML and images
+     *
+     * @param configurer a DefaultServletHandlerConfigurer object
+     */
     @Override
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
         configurer.enable();
@@ -319,9 +336,8 @@ class WebAppConfig extends WebMvcConfigurationSupport {
      */
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new CSRFHandlerInterceptor());
+        // TODO registry.addInterceptor(new CSRFHandlerInterceptor());
 
-        // i18n interceptor
         LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
         localeChangeInterceptor.setParamName("lang");
         registry.addInterceptor(localeChangeInterceptor);
@@ -365,13 +381,40 @@ class WebAppConfig extends WebMvcConfigurationSupport {
         /**
          * A method for mapping '/' or '/index' url
          *
-         * @param principal a Principle object
+         * @param principal      a Principle object
+         * @param authentication a Authentication object
          * @return a template uri
          */
         @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
-        String index(Principal principal) {
+        String index(Principal principal, Authentication authentication) {
+            // , @AuthenticationPrincipal User currentUser
             LOGGER.info("Principle exist : " + (null != principal));
+            LOGGER.info("Authentication exist : " + (null != authentication));
+            // User user = (User) authentication.getPrincipal();
+            // LOGGER.info("Username : {}", null == currentUser ? "" : currentUser.getUsername());
             return "index";
+        }
+    }
+
+    @Controller
+    static class LogoutController {
+
+        /**
+         * A method used for handle logout process
+         *
+         * @param request        a HttpServletRequest object
+         * @param response       a HttpServletResponse object
+         * @param authentication a Authentication object
+         * @return the uri when logout
+         */
+        @RequestMapping(value = "/logout", method = RequestMethod.GET)
+        String logout(HttpServletRequest request, HttpServletResponse response) {
+            LOGGER.info("{}", "WebAppConfig.logout");
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (null != authentication) {
+                new SecurityContextLogoutHandler().logout(request, response, authentication);
+            }
+            return "redirect:/index";
         }
     }
 }

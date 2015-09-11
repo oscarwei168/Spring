@@ -12,16 +12,37 @@
  */
 package tw.com.oscar.spring.util.config;
 
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.event.LoggerListener;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
-import tw.com.oscar.spring.util.security.UserService;
+import tw.com.oscar.spring.domain.Account;
+import tw.com.oscar.spring.domain.AccountLoginAttempt;
+import tw.com.oscar.spring.service.account.AccountService;
+import tw.com.oscar.spring.util.annotations.Log;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.Date;
 
 /**
  * <p>
@@ -41,19 +62,23 @@ import tw.com.oscar.spring.util.security.UserService;
  * @since 2015/8/6
  */
 @Configuration
-@EnableWebMvcSecurity
-//@ImportResource(value = "classpath:spring-security-context.xml")
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
+// mode = AdviceMode.ASPECTJ
+// @ImportResource(value = "classpath:spring-ldap-context.xml")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    /**
-     * A bean for obtain UserService object
-     *
-     * @return a UserService object
-     */
-    @Bean
-    public UserService userService() {
-        return new UserService();
-    }
+    @Log
+    Logger LOGGER;
+
+    @Autowired
+    UserDetailsService userService;
+
+    @Autowired
+    DataSource dataSource;
+
+    @Autowired
+    AccountService accountService;
 
     /**
      * A bean for obtain TokenBasedRememberMeServices object
@@ -62,17 +87,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Bean
     public TokenBasedRememberMeServices rememberMeServices() {
-        return new TokenBasedRememberMeServices("remember-me-key", userService());
+        return new TokenBasedRememberMeServices("remember-me-key", userService);
     }
 
     /**
-     * A bean for obtain password encoder object
+     * A bean used for obtains PersistentTokenRepository object to store remember-me token
      *
-     * @return a PasswordEncoder object
+     * @return a PersistentTokenRepository object
      */
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new StandardPasswordEncoder();
+    public PersistentTokenRepository persistentTokenRepository() {
+        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+        jdbcTokenRepository.setDataSource(this.dataSource);
+        return jdbcTokenRepository;
+    }
+
+    /**
+     * A bean used for obtains BCryptPasswordEncoder object
+     *
+     * @return a BCryptPasswordEncoder object
+     */
+    @Bean
+    public BCryptPasswordEncoder bcryptEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     /**
@@ -80,11 +117,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      *
      * @param auth a AuthenticationManagerBuilder object
      * @throws Exception throw exception when:<br>
-     *                   <ul><li>if cannot find any account info</li></ul>
+     *                   <ul><li>if cannot find any entity info</li></ul>
+     */
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.eraseCredentials(true).userDetailsService(userService).passwordEncoder(bcryptEncoder());
+    }
+
+    /**
+     * Ensuring that static contents(JavaScript, CSS, etc) is accessible from the login page without authentication
+     *
+     * @param web a WebSecurity object
+     * @throws Exception throw exception when:<br>if any exception occurred
      */
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.eraseCredentials(true).userDetailsService(userService()).passwordEncoder(passwordEncoder());
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/resources/**");
     }
 
     /**
@@ -96,9 +144,113 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/", "/index", "/favicon.ico", "/resources/**", "/signup").permitAll()
-                .anyRequest().authenticated().and().formLogin().loginPage("/signin").permitAll().failureUrl
-                ("/signin?error=1").loginProcessingUrl("/authenticate").and().logout().logoutUrl("/logout").permitAll
-                ().logoutSuccessUrl("/signin?logout").and().rememberMe().rememberMeServices(rememberMeServices()).key("remember-me-key");
+//        http.authorizeRequests().antMatchers("/", "/index", "/favicon.ico", "/resources/**", "/signup").permitAll()
+//                .anyRequest().authenticated().and().formLogin().loginPage("/signin").permitAll().failureUrl
+//                ("/signin?error=1").loginProcessingUrl("/authenticate").and().logout().logoutUrl("/logout").permitAll
+//                ().logoutSuccessUrl("/signin?logout").and().rememberMe().rememberMeServices(rememberMeServices()).key("remember-me-key");
+
+//        http.authorizeRequests().antMatchers("/", "/index", "/login", "/resources/**").permitAll()
+//                .anyRequest().authenticated()
+//                .and()
+//                .jee()
+//                .mappableRoles("USER", "ADMIN");
+
+//        http
+//                .exceptionHandling()
+//                .accessDeniedPage("/403")
+//                .and()
+//                .authorizeRequests()
+//                .antMatchers("/", "/index", "/resources/**").permitAll()
+//                .antMatchers("/secure/**").hasRole("ADMIN")
+//                .antMatchers("/oscar/**").access("hasRole('ADMIN') and hasRole('OSCAR')")
+//                .anyRequest().anonymous()
+//                .and()
+//                .formLogin()
+//                .loginPage("/login")
+//                .loginProcessingUrl("/login")
+//                .defaultSuccessUrl("/index")
+//                .failureUrl("/login?err=1")
+//                .usernameParameter("username")
+//                .passwordParameter("password")
+//                .permitAll()
+//                .and()
+//                .logout()
+//                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+//                        // .logoutSuccessHandler(null)
+//                .logoutSuccessUrl("/logout?out=1")
+//                .deleteCookies("JSESSIONID")
+//                .invalidateHttpSession(true)
+//                .permitAll()
+//                .and()
+//                .sessionManagement()
+//                .invalidSessionUrl("/login?time=1")
+//                .maximumSessions(1);
+
+        http
+                .authorizeRequests()
+                //.expressionHandler(null) PermissionEvaluator(AclPermissionEvaluator)
+                .antMatchers("/*", "/index", "/resources/**").permitAll()
+                .antMatchers("/secure/**").hasRole("ADMIN")
+                .antMatchers("/oscar/**").access("hasRole('ADMIN') and hasRole('MANAGER')")
+                //.anyRequest().authenticated()
+                .anyRequest().anonymous()
+                .and()
+                .formLogin().loginPage("/login").loginProcessingUrl("/authenticate").defaultSuccessUrl("/index")
+                .successHandler(authenticationSuccessHandler()).permitAll()
+                .and()
+                .logout().logoutUrl("/logout").deleteCookies("JSESSIONID")
+                //.invalidateHttpSession(false)
+                .logoutSuccessUrl("/index").permitAll()
+                .and()
+                .rememberMe().tokenRepository(persistentTokenRepository()).tokenValiditySeconds(1209600)
+                .and()
+                .sessionManagement().maximumSessions(1);
+                // invalidSessionUrl("/login?time=1")
+                // .expiredUrl("/login?expired");
     }
+
+    /**
+     * A bean that will be customize original authentication success handler
+     *
+     * @return a AuthenticationSuccessHandler object
+     */
+    @Bean
+    public SavedRequestAwareAuthenticationSuccessHandler authenticationSuccessHandler() {
+        return new SavedRequestAwareAuthenticationSuccessHandler() {
+            @Override
+            public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
+                super.onAuthenticationSuccess(request, response, authentication);
+                LOGGER.info("Login success...");
+                User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                LOGGER.info("Username : {}", user.getUsername());
+                Account account = accountService.findByUsername(user.getUsername()).get();
+                if (null != account.getAccountLoginAttempt()) {
+                    LOGGER.info("Username : {}", "1111");
+                    AccountLoginAttempt attempt = account.getAccountLoginAttempt();
+                    attempt.setCounts(0);
+                    attempt.setDateLastModified(new Date());
+                    accountService.save(account);
+                } else {
+                    LOGGER.info("Username : {}", "2222");
+                    AccountLoginAttempt attempt = new AccountLoginAttempt();
+                    attempt.setAccount(account);
+                    attempt.setCounts(0);
+                    attempt.setDateCreated(new Date());
+                    account.setAccountLoginAttempt(attempt);
+                    // accountService.save(account);
+                }
+            }
+        };
+    }
+
+    /**
+     * Automatically receives AuthenticationEvent messages
+     *
+     * @return a LoggerListener object
+     */
+    @Bean
+    public LoggerListener loggerListener() {
+        return new LoggerListener();
+    }
+
 }

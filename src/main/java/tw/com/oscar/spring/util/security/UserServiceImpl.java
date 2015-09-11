@@ -1,5 +1,5 @@
 /**
- * UserService.java
+ * UserServiceImpl.java
  * Title: Oscar Wei Web Project
  * Copyright: Copyright(c)2015, oscarwei168
  *
@@ -13,21 +13,20 @@
 package tw.com.oscar.spring.util.security;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tw.com.oscar.spring.domain.Account;
 import tw.com.oscar.spring.service.account.AccountService;
+import tw.com.oscar.spring.util.annotations.Log;
 
-import javax.annotation.PostConstruct;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,7 +34,7 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * <p>
- * Title: UserService.java<br>
+ * Title: UserServiceImpl.java<br>
  * </p>
  * <strong>Description:</strong> A spring security framework's UserDetail implementation<br>
  * This function include: - <br>
@@ -50,52 +49,55 @@ import static java.util.stream.Collectors.toList;
  * @version v1, 2015/8/6
  * @since 2015/8/6
  */
-// @Component
-public class UserService implements UserDetailsService {
+@Service
+public class UserServiceImpl implements UserDetailsService {
 
-    // @Log
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+    @Log
+    Logger LOGGER;
 
     @Autowired
     private AccountService accountService;
 
     /**
-     * A initialize method
+     * A method used for searching Account object by username
+     *
+     * @param username a username
+     * @return a UserDetails object
+     * @throws UsernameNotFoundException throw exception when:<br>if cannot find any Account object
      */
-    @PostConstruct
-    protected void initialize() {
-        LOGGER.info("[Enter] UserService.initialize");
-    }
-
     @Override
-    // @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         LOGGER.info("Login username : {}", username);
-        Account account = accountService.findById(1L).orElseGet(Account::new); // TOTO
+        Account account = this.accountService.findByUsername(username).get();
         if (null == account) {
-            throw new UsernameNotFoundException("Cannot find specific account...");
+            LOGGER.error("Cannot find any specific account...");
+            throw new UsernameNotFoundException("Cannot find any specific account...");
         }
 
-        // LOGGER.info("Password : " + BCrypt.hashpw(customer.getPassword(), BCrypt.gensalt()));
+        LOGGER.info("Password : {}", account.getPassword());
+        // LOGGER.info("Password : {}", BCrypt.hashpw(account.getPassword(), BCrypt.gensalt()));
         return createUser(account);
     }
 
-    public void signin(Account account) {
-        SecurityContextHolder.getContext().setAuthentication(authentication(account));
-    }
-
-    private Authentication authentication(Account account) {
-//        org.springframework.security.core.Authentication request = new UsernamePasswordAuthenticationToken(
-//                this.authenticator.getUsername(), this.authenticator.getPassword());
-        return new UsernamePasswordAuthenticationToken(createUser(account), null, createAuthority(account));
-    }
-
+    /**
+     * A method used for generating User object by Account object
+     *
+     * @param account a Account object
+     * @return a spring security specific User object
+     */
     private User createUser(Account account) {
         return new User(account.getUsername(), account.getPassword(), account.isEnabled(),
                 account.isAccountNonExpired(), account.isCredentialsNonExpired(),
                 account.isAccountNonLocked(), createAuthority(account));
     }
 
+    /**
+     * A method used for obtaining GrantedAuthority object by Account roles
+     *
+     * @param account a Account object
+     * @return list of GrantedAuthority objects
+     */
     private Set<GrantedAuthority> createAuthority(Account account) {
         // AuthorityUtils.createAuthorityList(account.getRoles());
         Set<GrantedAuthority> authorities = new HashSet<>(account.getRoles().size());

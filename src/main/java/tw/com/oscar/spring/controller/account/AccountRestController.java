@@ -53,7 +53,7 @@ public class AccountRestController {
     private AccountService accountService;
 
     /**
-     * A restful controller sample
+     * A RESTful controller sample
      *
      * @param id a request parameter named id
      * @return a Account object
@@ -65,13 +65,18 @@ public class AccountRestController {
         return accountService.findById(id).orElse(new Account());
     }
 
+    /**
+     * A RESTful JAXB marshal example
+     *
+     * @return a AccountListXML object
+     */
     @RequestMapping(value = "/accountsxml")
     public AccountListXML accountsxml() {
         LOGGER.info("{}", "[Enter] AccountController.accountsxml");
         AccountListXML accountList = new AccountListXML();
         AccountXML a1 = new AccountXML(1L, "oscarwei168", "Oscar", "Wei", "oscarwei168@msn.com");
-        AccountXML a2 = new AccountXML(2L, "oscarwei168", "Oscar", "Wei", "oscarwei168@msn.com");
-        AccountXML a3 = new AccountXML(3L, "oscarwei168", "Oscar", "Wei", "oscarwei168@msn.com");
+        AccountXML a2 = new AccountXML(2L, "someone", "Some", "One", "someone@msn.com");
+        AccountXML a3 = new AccountXML(3L, "another-one", "Another", "One", "anotherone@msn.com");
         accountList.getAccounts().add(a1);
         accountList.getAccounts().add(a2);
         accountList.getAccounts().add(a3);
