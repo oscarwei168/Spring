@@ -20,7 +20,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tw.com.oscar.spring.domain.Account;
@@ -36,7 +35,7 @@ import static java.util.stream.Collectors.toList;
  * <p>
  * Title: UserServiceImpl.java<br>
  * </p>
- * <strong>Description:</strong> A spring security framework's UserDetail implementation<br>
+ * <strong>Description:</strong> A spring security framework's UserDetailsService implementation<br>
  * This function include: - <br>
  * <p>
  * Copyright: Copyright (c) 2015<br>
@@ -77,7 +76,7 @@ public class UserServiceImpl implements UserDetailsService {
 
         LOGGER.info("Password : {}", account.getPassword());
         // LOGGER.info("Password : {}", BCrypt.hashpw(account.getPassword(), BCrypt.gensalt()));
-        return createUser(account);
+        return new SecurityUser(account);
     }
 
     /**

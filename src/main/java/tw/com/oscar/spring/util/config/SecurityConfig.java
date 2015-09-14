@@ -25,24 +25,22 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
-import tw.com.oscar.spring.domain.Account;
-import tw.com.oscar.spring.domain.AccountLoginAttempt;
 import tw.com.oscar.spring.service.account.AccountService;
 import tw.com.oscar.spring.util.annotations.Log;
+import tw.com.oscar.spring.util.security.CustomLogoutSuccessHandler;
+import tw.com.oscar.spring.util.security.SecurityUser;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * <p>
@@ -96,7 +94,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @return a PersistentTokenRepository object
      */
     @Bean
-    public PersistentTokenRepository persistentTokenRepository() {
+    public JdbcTokenRepositoryImpl persistentTokenRepository() {
         JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
         jdbcTokenRepository.setDataSource(this.dataSource);
         return jdbcTokenRepository;
@@ -146,22 +144,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                        //.expressionHandler(null) PermissionEvaluator(AclPermissionEvaluator)
-                .antMatchers("/*", "/index", "/resources/**").permitAll()
+                        //.expressionHandler(null).accessDeniedPage("/accessDenied") PermissionEvaluator
+                        // (AclPermissionEvaluator)
+                .antMatchers("/", "/*", "/index", "/resources/**").permitAll()
                 .antMatchers("/secure/**").hasRole("ADMIN")
                 .antMatchers("/oscar/**").access("hasRole('ADMIN') and hasRole('MANAGER')")
                 //.anyRequest().authenticated()
                 .anyRequest().anonymous()
                 .and()
-                .formLogin().loginPage("/login").loginProcessingUrl("/authenticate").defaultSuccessUrl("/index")
-                .successHandler(authenticationSuccessHandler()).permitAll()
-                .and()
-                .logout().logoutUrl("/logout").deleteCookies("JSESSIONID").invalidateHttpSession(true)
-                .logoutSuccessUrl("/index").permitAll()
-                .and()
-                .rememberMe().tokenRepository(persistentTokenRepository()).tokenValiditySeconds(1209600)
-                .and()
-                .sessionManagement().maximumSessions(1);
+                .formLogin().loginPage("/login").loginProcessingUrl("/authenticate").defaultSuccessUrl("/index", true)
+                .successHandler(authenticationSuccessHandler()).permitAll();
+                //.and()
+                //.logout().logoutUrl("/logout")
+                //.logoutSuccessHandler(customLogoutSuccessHandler()).deleteCookies
+                //("JSESSIONID").invalidateHttpSession(true)
+                //.logoutSuccessUrl("/index").permitAll();
+                //.and()
+                //.rememberMe().tokenRepository(persistentTokenRepository()).tokenValiditySeconds(1209600)
+                //.and()
+                //.sessionManagement().maximumSessions(1);
         // invalidSessionUrl("/login?time=1")
         // .expiredUrl("/login?expired");
 
@@ -216,30 +217,50 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public SavedRequestAwareAuthenticationSuccessHandler authenticationSuccessHandler() {
         return new SavedRequestAwareAuthenticationSuccessHandler() {
+
+            /**
+             * A handler while login successful
+             *
+             * @param request a HttpServletRequest object
+             * @param response a HttpServletResponse object
+             * @param authentication a Authentication object
+             * @throws ServletException
+             * @throws IOException
+             */
             @Override
             public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
                 super.onAuthenticationSuccess(request, response, authentication);
                 LOGGER.info("Login success...");
-                User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-                LOGGER.info("Username : {}", user.getUsername());
-                Account account = accountService.findByUsername(user.getUsername()).get();
-                if (null != account.getAccountLoginAttempt()) {
-                    LOGGER.info("Username : {}", "1111");
-                    AccountLoginAttempt attempt = account.getAccountLoginAttempt();
-                    attempt.setCounts(0);
-                    attempt.setDateLastModified(new Date());
-                    accountService.save(account);
-                } else {
-                    LOGGER.info("Username : {}", "2222");
-                    AccountLoginAttempt attempt = new AccountLoginAttempt();
-                    attempt.setAccount(account);
-                    attempt.setCounts(0);
-                    attempt.setDateCreated(new Date());
-                    account.setAccountLoginAttempt(attempt);
-                    // accountService.save(account);
-                }
+                SecurityUser user = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                LOGGER.info("Id: {}, Username : {}, Email: {}", user.getId(), user.getUsername(), user.getEmail());
+//                Account account = accountService.findByUsername(user.getUsername()).get();
+//                if (null != account.getAccountLoginAttempt()) {
+//                    LOGGER.info("Username : {}", "1111");
+//                    AccountLoginAttempt attempt = account.getAccountLoginAttempt();
+//                    attempt.setCounts(0);
+//                    attempt.setDateLastModified(new Date());
+//                    accountService.save(account);
+//                } else {
+//                    LOGGER.info("Username : {}", "2222");
+//                    AccountLoginAttempt attempt = new AccountLoginAttempt();
+//                    attempt.setAccount(account);
+//                    attempt.setCounts(0);
+//                    attempt.setDateCreated(new Date());
+//                    account.setAccountLoginAttempt(attempt);
+//                    // accountService.save(account);
+//                }
             }
         };
+    }
+
+    /**
+     * A customer logout success handler
+     *
+     * @return the LogoutSuccessHandler object
+     */
+    @Bean
+    public LogoutSuccessHandler customLogoutSuccessHandler() {
+        return new CustomLogoutSuccessHandler();
     }
 
     /**

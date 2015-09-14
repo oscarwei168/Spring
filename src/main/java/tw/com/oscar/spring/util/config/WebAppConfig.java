@@ -29,6 +29,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
@@ -56,6 +57,7 @@ import org.thymeleaf.templateresolver.TemplateResolver;
 import tw.com.oscar.spring.Application;
 import tw.com.oscar.spring.util.formatter.AccountFormatter;
 import tw.com.oscar.spring.util.formatter.DateFormatter;
+import tw.com.oscar.spring.util.security.SecurityUser;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -381,30 +383,30 @@ class WebAppConfig extends WebMvcConfigurationSupport {
         /**
          * A method for mapping '/' or '/index' url
          *
-         * @param principal      a Principle object
-         * @param authentication a Authentication object
+         * @param securityUser a AuthenticatedUser object
          * @return a template uri
          */
         @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
-        String index(Principal principal, Authentication authentication) {
-            // , @AuthenticationPrincipal User currentUser
+        String index(@AuthenticationPrincipal SecurityUser securityUser, Principal principal) {
             LOGGER.info("Principle exist : " + (null != principal));
-            LOGGER.info("Authentication exist : " + (null != authentication));
-            // User user = (User) authentication.getPrincipal();
-            // LOGGER.info("Username : {}", null == currentUser ? "" : currentUser.getUsername());
+            LOGGER.info("Principle Username : {}", null == principal ? "" : principal.getName());
+            LOGGER.info("AuthenticatedUser exist : " + (null != securityUser));
+            LOGGER.info("AuthenticatedUser Username : {}", null == securityUser ? "" : securityUser.getUsername());
             return "index";
         }
     }
 
+    /**
+     * A logout controller
+     */
     @Controller
     static class LogoutController {
 
         /**
          * A method used for handle logout process
          *
-         * @param request        a HttpServletRequest object
-         * @param response       a HttpServletResponse object
-         * @param authentication a Authentication object
+         * @param request  a HttpServletRequest object
+         * @param response a HttpServletResponse object
          * @return the uri when logout
          */
         @RequestMapping(value = "/logout", method = RequestMethod.GET)

@@ -267,7 +267,7 @@ public class Account extends VersionEntity {
         this.accountLoginAttempt = accountLoginAttempt;
     }
 
-    @ManyToMany(mappedBy = "accounts")
+    @ManyToMany(mappedBy = "accounts", fetch = FetchType.EAGER)
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @ForeignKey(name = "FK_ACCOUNT_ROLE")
     public Set<Role> getRoles() {

@@ -76,7 +76,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Account> findById(final Long id) {
-        LOGGER.info("[Enter] AccountServiceImpl.findById, id = {}", id);
         return Optional.ofNullable(accountDao.find(id));
     }
 
@@ -86,7 +85,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Account> findByLoadId(final Long id) {
-        LOGGER.info("[Enter] AccountServiceImpl.findByLoadId, id = {}", id);
         return Optional.ofNullable(accountDao.getReference(id));
     }
 
@@ -96,7 +94,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Account> findByUsername(String username) throws UsernameNotFoundException {
-        LOGGER.info("[Enter] AccountServiceImpl.findByUsername, username = {}", username);
         Search search = new Search(Account.class);
         Filter filter = new Filter("username", username, Filter.OP_EQUAL);
         search.addFilter(filter);

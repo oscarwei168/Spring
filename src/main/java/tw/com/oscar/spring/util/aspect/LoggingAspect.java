@@ -15,7 +15,6 @@ package tw.com.oscar.spring.util.aspect;
 import com.google.common.base.Joiner;
 import com.jamonapi.*;
 import com.jamonapi.aop.spring.JamonAopKeyHelper;
-import com.jamonapi.aop.spring.JamonAopKeyHelperInt;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -57,7 +56,7 @@ public class LoggingAspect {
     private static final DecimalFormat MS_FORMAT = new DecimalFormat("###,###");
     private static final DecimalFormat AVG_MS_FORMAT = new DecimalFormat("###,###.###");
     protected Monitor monitor;
-    protected JamonAopKeyHelperInt keyHelper;
+    protected JamonAopKeyHelper keyHelper;
 
     @Value("${app.loggingAspect.enabled}")
     private boolean enabled;
@@ -87,32 +86,17 @@ public class LoggingAspect {
             Object retVal = null;
             String label = keyHelper.getLabel(joinPoint);
             String details = keyHelper.getDetails(joinPoint);
-            LOGGER.info("Label: {}, Details: {}", label, details);
+            // LOGGER.info("Label: {}, Details: {}", label, details);
             MonKeyImp key = new MonKeyImp(label, details, "ms.");
             this.monitor = MonitorFactory.start(key);
             // StopWatch stopWatch = new StopWatch();
             // stopWatch.start();
-            LOGGER.info("Calling " + joinPoint.getSignature().getName() + " method...");
             try {
+                String invokedInfo = getMethodSignature(joinPoint);
+                LOGGER.info("[Enter] " + invokedInfo);
                 retVal = joinPoint.proceed();
-                StringBuffer buffer = new StringBuffer(KEYWORD_RETURN);
-                buffer.append("------------------------------------------").append(KEYWORD_RETURN);
-                buffer.append("Target: ");
-                buffer.append(joinPoint.getTarget().getClass().getName()).append(".");
-                buffer.append(joinPoint.getSignature().getName()).append("(");
-                Object[] args = joinPoint.getArgs();
-                buffer.append(Joiner.on(", ").join(args));
-                buffer.append(")").append(KEYWORD_RETURN);
-                // buffer.append(" execution time : ").append(stopWatch.getTime()).append("ms").append(KEYWORD_RETURN);
-                buffer.append("Execution Date: ").append(this.getLastAccess()).append(KEYWORD_RETURN);
-                buffer.append("Service Call: ").append(this.getHits()).append(KEYWORD_RETURN);
-                buffer.append("Last Execution Time: ").append(this.getLastValue()).append(" ms").append(KEYWORD_RETURN);
-                buffer.append("Avg Execution Time: ").append(this.getAvg()).append(" ms").append(KEYWORD_RETURN);
-                buffer.append("Total Execution Time: ").append(this.getTotal()).append(" ms").append(KEYWORD_RETURN);
-                buffer.append("Min Execution Time: ").append(this.getMin()).append(" ms").append(KEYWORD_RETURN);
-                buffer.append("Max Execution Time: ").append(this.getMax()).append(" ms").append(KEYWORD_RETURN);
-                buffer.append("------------------------------------------");
-                LOGGER.info(buffer.toString());
+                LOGGER.info("[Exit] " + invokedInfo);
+                LOGGER.info(printingLogInfo(joinPoint).toString());
             } catch (Throwable throwable) {
                 LOGGER.error(throwable.getMessage(), throwable);
                 String exceptionDetails = keyHelper.getDetails(joinPoint, throwable);
@@ -130,6 +114,11 @@ public class LoggingAspect {
         }
     }
 
+    /**
+     * Enable/disable setting exception listener
+     *
+     * @param enabled whether enable JAMon exception listener
+     */
     public void setExceptionBufferListener(boolean enabled) {
         MonKey key = new MonKeyImp(MonitorFactory.EXCEPTIONS_LABEL, EXCEPTION);
         boolean hasBufferListener = MonitorFactory.getMonitor(key).hasListener("value", "FIFOBuffer");
@@ -143,7 +132,7 @@ public class LoggingAspect {
     }
 
     /**
-     * Specifies to have the methods arguments viewable in the jamon monitor details. This is viewable from the jamon
+     * Specifies to have the methods arguments viewable in the JAMon monitor details. This is viewable from the jamon
      * web application.  It will allow you to see what values were passed to monitored methods via the web app.
      * By default this is disabled.
      *
@@ -154,7 +143,7 @@ public class LoggingAspect {
     }
 
     /**
-     * Specifies to have the methods arguments viewable in the jamon monitor details. This is viewable from the jamon
+     * Specifies to have the methods arguments viewable in the JAMon monitor details. This is viewable from the jamon
      * web application.  It will allow you to see what values were passed to monitored methods that threw an exception.
      * By default this is disabled.
      *
@@ -191,6 +180,46 @@ public class LoggingAspect {
     private void trackException(Throwable exception, String exceptionDetails) {
         MonitorFactory.add(new MonKeyImp(keyHelper.getExceptionLabel(exception), exceptionDetails, EXCEPTION), 1);
         MonitorFactory.add(new MonKeyImp(MonitorFactory.EXCEPTIONS_LABEL, exceptionDetails, EXCEPTION), 1);
+    }
+
+    /**
+     * A method used for printing log information
+     *
+     * @param joinPoint a ProceedingJoinPoint object
+     * @return the StringBuffer object
+     */
+    private StringBuffer printingLogInfo(ProceedingJoinPoint joinPoint) {
+        StringBuffer buffer = new StringBuffer(KEYWORD_RETURN);
+        buffer.append("--------Performance Statistics------------------").append(KEYWORD_RETURN);
+        // buffer.append("Target: ");
+        // buffer.append(joinPoint.getTarget().getClass().getName()).append(".");
+//        buffer.append(joinPoint.getSignature().getName()).append("(");
+//        Object[] args = joinPoint.getArgs();
+//        buffer.append(Joiner.on(", ").join(args));
+//        buffer.append(")").append(KEYWORD_RETURN);
+        buffer.append("Execution Date: ").append(this.getLastAccess()).append(KEYWORD_RETURN);
+        buffer.append("Service Call: ").append(this.getHits()).append(KEYWORD_RETURN);
+        buffer.append("Last Execution Time: ").append(this.getLastValue()).append(" ms").append(KEYWORD_RETURN);
+        buffer.append("Avg Execution Time: ").append(this.getAvg()).append(" ms").append(KEYWORD_RETURN);
+        buffer.append("Total Execution Time: ").append(this.getTotal()).append(" ms").append(KEYWORD_RETURN);
+        buffer.append("Min Execution Time: ").append(this.getMin()).append(" ms").append(KEYWORD_RETURN);
+        buffer.append("Max Execution Time: ").append(this.getMax()).append(" ms").append(KEYWORD_RETURN);
+        buffer.append("------------------------------------------------").append(KEYWORD_RETURN);
+        return buffer;
+    }
+
+    /**
+     * A method used for obtaining invoking method info
+     *
+     * @param joinPoint a ProceedingJoinPoint object
+     * @return the invoking info
+     */
+    private String getMethodSignature(ProceedingJoinPoint joinPoint) {
+        String classDefinition = joinPoint.getTarget().getClass().getName();
+        String methodDefinition = joinPoint.getSignature().getName();
+        String argsDefinitions = Joiner.on(", ").join(joinPoint.getArgs());
+        return new StringBuffer(classDefinition).append(".").append(methodDefinition).append("(").append
+                (argsDefinitions).append(")").toString();
     }
 
     /**

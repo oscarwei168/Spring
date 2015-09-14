@@ -41,7 +41,7 @@ javadoc {
 gretty {
     servletContainer = 'tomcat8'
     httpPort = 9090
-    // debugPort = 9999
+    debugPort = 9999
     debugSuspend = true
     contextPath = '/oscarspring'
     managedClassReload = false
@@ -61,7 +61,7 @@ gretty {
             '-agentpath:/Applications/jbdevstudio/studio/plugins/org.zeroturnaround.eclipse.embedder_6.2.3.RELEASE-201508181656/jr6/jrebel/lib/libjrebel64.dylib',
             '-Xms512m',
             '-Xmx2048m',
-            '-XX:MaxPermSize=1024m',
+            // '-XX:MaxPermSize=1024m',
             '-Dspring.profiles.active=dev'
     ]
 }
