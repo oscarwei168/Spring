@@ -14,9 +14,6 @@ package tw.com.oscar.spring.util.security;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,11 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import tw.com.oscar.spring.domain.Account;
 import tw.com.oscar.spring.service.account.AccountService;
 import tw.com.oscar.spring.util.annotations.Log;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * <p>
@@ -78,30 +70,5 @@ public class UserServiceImpl implements UserDetailsService {
         // LOGGER.info("Password : {}", BCrypt.hashpw(account.getPassword(), BCrypt.gensalt()));
         return new SecurityUser(account);
     }
-
-    /**
-     * A method used for generating User object by Account object
-     *
-     * @param account a Account object
-     * @return a spring security specific User object
-     */
-    private User createUser(Account account) {
-        return new User(account.getUsername(), account.getPassword(), account.isEnabled(),
-                account.isAccountNonExpired(), account.isCredentialsNonExpired(),
-                account.isAccountNonLocked(), createAuthority(account));
-    }
-
-    /**
-     * A method used for obtaining GrantedAuthority object by Account roles
-     *
-     * @param account a Account object
-     * @return list of GrantedAuthority objects
-     */
-    private Set<GrantedAuthority> createAuthority(Account account) {
-        // AuthorityUtils.createAuthorityList(account.getRoles());
-        Set<GrantedAuthority> authorities = new HashSet<>(account.getRoles().size());
-        authorities.addAll(account.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName()))
-                .collect(toList()));
-        return authorities;
-    }
+    
 }

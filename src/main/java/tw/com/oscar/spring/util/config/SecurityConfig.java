@@ -160,7 +160,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin().loginPage("/login").loginProcessingUrl("/authenticate").defaultSuccessUrl("/index", true)
                 .successHandler(authenticationSuccessHandler()).permitAll()
-                //.and()
+                .and()
+                .logout().deleteCookies("JSESSIONID").invalidateHttpSession(true)
                 //.logout().logoutUrl("/logout")
                 //.logoutSuccessHandler(customLogoutSuccessHandler()).deleteCookies
                 //("JSESSIONID").invalidateHttpSession(true)
@@ -168,9 +169,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .rememberMe().rememberMeCookieName("remember-me").tokenRepository(persistentTokenRepository())
                 .tokenValiditySeconds(1209600)
-                .and().exceptionHandling().accessDeniedPage("/accessDenied");
-        //.and()
-        //.sessionManagement().maximumSessions(1);
+                .and().exceptionHandling().accessDeniedPage("/accessDenied")
+                .and()
+                .sessionManagement().maximumSessions(1);
         // invalidSessionUrl("/login?time=1")
         // .expiredUrl("/login?expired");
     }

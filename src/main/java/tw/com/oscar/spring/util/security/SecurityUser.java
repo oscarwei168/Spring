@@ -17,6 +17,7 @@ import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import tw.com.oscar.spring.domain.Account;
+import tw.com.oscar.spring.domain.Role;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -44,6 +45,7 @@ import static java.util.stream.Collectors.toList;
 public class SecurityUser extends Account implements UserDetails {
 
     private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
+    private static final String PERMISSION_PREFIX = "ROLE_PERMISSION_";
 
     /**
      * A default constructor
@@ -80,8 +82,12 @@ public class SecurityUser extends Account implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>(this.getRoles().size());
-        authorities.addAll(this.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName()))
+        authorities.addAll(this.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(toList()));
+        for (Role role : this.getRoles()) {
+            authorities.addAll(role.getPermissions().stream().map(p -> new SimpleGrantedAuthority(PERMISSION_PREFIX +
+                    p.getName())).collect(toList()));
+        }
         return authorities;
     }
 }

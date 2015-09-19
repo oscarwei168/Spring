@@ -1,13 +1,13 @@
 /**
- * Role.java
+ * Permission.java
  * Title: Oscar Wei Web Project
  * Copyright: Copyright(c)2015, oscarwei168
  *
  * @author Oscar Wei
- * @since 2015/8/7
+ * @since 2015/9/19
  * <p>
  * H i s t o r y
- * 2015/8/7 Oscar Wei v1
+ * 2015/9/19 Oscar Wei v1
  * + File created
  */
 package tw.com.oscar.spring.domain;
@@ -16,14 +16,13 @@ import org.hibernate.annotations.Cascade;
 import tw.com.oscar.spring.domain.commons.BaseEntity;
 
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  * <p>
- * Title: Role.java<br>
+ * Title: Permission.java<br>
  * </p>
- * <strong>Description:</strong> A Role entity <br>
+ * <strong>Description:</strong> A permission entity object <br>
  * This function include: - <br>
  * <p>
  * Copyright: Copyright (c) 2015<br>
@@ -33,23 +32,23 @@ import java.util.Set;
  * </p>
  *
  * @author Oscar Wei
- * @version v1, 2015/8/7
- * @since 2015/8/7
+ * @version v1, 2015/9/19
+ * @since 2015/9/19
  */
 @Entity
-@Table(name = "ROLE", uniqueConstraints = @UniqueConstraint(name = "UK_ROLENAME", columnNames = {"NAME"}))
-public class Role extends BaseEntity {
+@Table(name = "PERMISSION", uniqueConstraints = @UniqueConstraint(name = "UK_PERMISSION_NAME", columnNames =
+        {"NAME"}))
+public class Permission extends BaseEntity {
 
     private String name;
     private String description;
 
-    private Set<Account> accounts;
-    private Set<Permission> permissions = new HashSet<>(0);
+    Set<Role> roles;
 
-    public Role() {
+    public Permission() {
     }
 
-    public Role(String name) {
+    public Permission(String name) {
         super();
         this.name = name;
     }
@@ -74,26 +73,15 @@ public class Role extends BaseEntity {
 
     @ManyToMany
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    @JoinTable(name = "ACCOUNT_ROLE", joinColumns = {@JoinColumn(name = "ID_ROLE")}, inverseJoinColumns = {
-            @JoinColumn(name = "ID_ACCOUNT")})
-    @org.hibernate.annotations.ForeignKey(name = "FK_ROLE_ACCOUNT")
-    public Set<Account> getAccounts() {
-        return accounts;
+    @JoinTable(name = "ROLE_PERMISSION", joinColumns = {@JoinColumn(name = "ID_PERMISSION")}, inverseJoinColumns = {
+            @JoinColumn(name = "ID_ROLE")})
+    @org.hibernate.annotations.ForeignKey(name = "FK_PERMISSION_ROLE")
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-    public void setAccounts(Set<Account> accounts) {
-        this.accounts = accounts;
-    }
-
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    @org.hibernate.annotations.ForeignKey(name = "FK_ROLE_PERMISSION")
-    public Set<Permission> getPermissions() {
-        return permissions;
-    }
-
-    public void setPermissions(Set<Permission> permissions) {
-        this.permissions = permissions;
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     @Override
@@ -101,10 +89,10 @@ public class Role extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Role role = (Role) o;
+        Permission that = (Permission) o;
 
-        if (getName() != null ? !getName().equals(role.getName()) : role.getName() != null) return false;
-        return !(getDescription() != null ? !getDescription().equals(role.getDescription()) : role.getDescription() != null);
+        if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) return false;
+        return !(getDescription() != null ? !getDescription().equals(that.getDescription()) : that.getDescription() != null);
 
     }
 
