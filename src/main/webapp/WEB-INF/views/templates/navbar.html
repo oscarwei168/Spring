@@ -230,7 +230,7 @@
         <li class="dropdown" th:with="currentUser=${#httpServletRequest.userPrincipal?.name}">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#" th:if="${currentUser != null}">
                 <i class="fa fa-user fa-fw"></i>
-                Admin
+                <span th:text="${currentUser}">Admin</span>
                 <i class="fa fa-caret-down"></i>
             </a>
             <a class="dropdown-toggle" data-toggle="dropdown" href="#" th:if="${currentUser == null}">
@@ -248,12 +248,6 @@
                 <li><a href="#" th:href="@{/logout}" th:if="${#authorization.expression('isAuthenticated()')}"><i
                         class="fa fa-gear fa-fw"></i> Logout</a>
                 </li>
-                <!--<li>-->
-                <!--<form method="post" action="#" th:action="@{/logout}"><i class="fa fa-sign-out fa-fw"></i>-->
-                <!--<input type="submit" value="Logout" />-->
-                <!--<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>-->
-                <!--</form>-->
-                <!--</li>-->
             </ul>
             <!-- /.dropdown-user -->
         </li>

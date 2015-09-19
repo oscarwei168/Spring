@@ -28,11 +28,9 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -59,11 +57,9 @@ import tw.com.oscar.spring.util.formatter.AccountFormatter;
 import tw.com.oscar.spring.util.formatter.DateFormatter;
 import tw.com.oscar.spring.util.security.SecurityUser;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.Charset;
 import java.security.Principal;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -257,14 +253,14 @@ class WebAppConfig extends WebMvcConfigurationSupport {
     }
 
     /**
-     * A spring HttpMessageConverter for handling media type like json, etc.
+     * A spring type HttpMessageConverter for handling media type like json, etc.
      *
      * @return a HttpMessageConverter object
      */
     @Bean
     public HttpMessageConverter<String> responseBodyConverter() {
         StringHttpMessageConverter converter = new StringHttpMessageConverter();
-        converter.setSupportedMediaTypes(Arrays.asList(new MediaType("application", "json", Charset.forName("UTF-8"))));
+        converter.setSupportedMediaTypes(Collections.singletonList(new MediaType("application", "json", Charset.forName("UTF-8"))));
         return converter;
     }
 
@@ -387,36 +383,13 @@ class WebAppConfig extends WebMvcConfigurationSupport {
          * @return a template uri
          */
         @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
-        String index(@AuthenticationPrincipal SecurityUser securityUser, Principal principal) {
+        String index(@AuthenticationPrincipal SecurityUser securityUser, Principal principal, ModelMap model) {
             LOGGER.info("Principle exist : " + (null != principal));
             LOGGER.info("Principle Username : {}", null == principal ? "" : principal.getName());
             LOGGER.info("AuthenticatedUser exist : " + (null != securityUser));
             LOGGER.info("AuthenticatedUser Username : {}", null == securityUser ? "" : securityUser.getUsername());
+            model.addAttribute("principal", principal);
             return "index";
-        }
-    }
-
-    /**
-     * A logout controller
-     */
-    @Controller
-    static class LogoutController {
-
-        /**
-         * A method used for handle logout process
-         *
-         * @param request  a HttpServletRequest object
-         * @param response a HttpServletResponse object
-         * @return the uri when logout
-         */
-        @RequestMapping(value = "/logout", method = RequestMethod.GET)
-        String logout(HttpServletRequest request, HttpServletResponse response) {
-            LOGGER.info("{}", "WebAppConfig.logout");
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (null != authentication) {
-                new SecurityContextLogoutHandler().logout(request, response, authentication);
-            }
-            return "redirect:/index";
         }
     }
 }

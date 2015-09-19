@@ -82,5 +82,7 @@ public interface AccountService {
      *
      * @param entity a AccountLoginAttempt object
      */
+    // @PreAuthorize("hasRole('ADMIN') AND hasRole('DBA')")
     void save(AccountLoginAttempt entity);
+
 }

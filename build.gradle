@@ -55,14 +55,15 @@ gretty {
     // baseDir = '/Users/oscarwei168/IdeaProjects/OscarSpring/build/serverBaseDir_tomcat8'
     jvmArgs = [
             '-Drebel.base=/Users/oscarwei168/.jrebel',
+            '-Drebel.remoting_plugin=true',
             '-Drebel.notification.url=http://localhost:50618',
             '-Drebel.workspace.path=/Users/oscarwei168/IdeaProjects',
             '-Drebel.properties=/Users/oscarwei168/.jrebel/jrebel.properties',
-            '-agentpath:/Applications/jbdevstudio/studio/plugins/org.zeroturnaround.eclipse.embedder_6.2.3.RELEASE-201508181656/jr6/jrebel/lib/libjrebel64.dylib',
+            '-agentpath:/Applications/jbdevstudio/studio/plugins/org.zeroturnaround.eclipse.embedder_6.2.4.RELEASE-201509091324/jr6/jrebel/lib/libjrebel64.dylib',
             '-Xms512m',
-            '-Xmx2048m',
+            '-Xmx2048m'
             // '-XX:MaxPermSize=1024m',
-            '-Dspring.profiles.active=dev'
+            // '-Dspring.profiles.active=dev'
     ]
 }
 

@@ -77,6 +77,7 @@ public class Account extends VersionEntity {
 
     public static final String SQL_ACCOUNT_FIND_BY_EMAIL = "accountFindByEmail";
 
+    /** Fields definitions **/
     private String username;
     // @JsonIgnore
     private String password;
@@ -94,6 +95,7 @@ public class Account extends VersionEntity {
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
 
+    /** Relationship definition **/
     private AccountLoginAttempt accountLoginAttempt;
     private Set<Role> roles = new HashSet<>(0);
 
